@@ -35,20 +35,41 @@ void Tetris::loop()
 						quit = true;
 					} else if (e.key.keysym.sym == SDLK_SPACE) {
 					} else if (e.key.keysym.sym == SDLK_UP) {
-						Tetris::yoff -= 10;
+						Tetris::up = true;
 					} else if (e.key.keysym.sym == SDLK_RIGHT) {
-						Tetris::xoff += 10;
+						Tetris::right = true;
 					} else if (e.key.keysym.sym == SDLK_LEFT) {
-						Tetris::xoff -= 10;
+						Tetris::left = true;
 					} else if (e.key.keysym.sym == SDLK_DOWN) {
-						Tetris::yoff += 10;
+						Tetris::down = true;
 					}
 					break;
 				case SDL_KEYUP:
+					if (e.key.keysym.sym == SDLK_RIGHT) {
+						Tetris::right = false;
+					} else if (e.key.keysym.sym == SDLK_LEFT) {
+						Tetris::left = false;
+					} else if (e.key.keysym.sym == SDLK_DOWN) {
+						Tetris::down = false;
+					} else if (e.key.keysym.sym == SDLK_UP) {
+						Tetris::up = false;
+					}
 					break;
 				default:
 					break;
 			}
+		}
+		if (Tetris::left) {
+			--Tetris::xoff;
+		}
+		if (Tetris::right) {
+			++Tetris::xoff;
+		}
+		if (Tetris::down) {
+			++Tetris::yoff;
+		}
+		if (Tetris::up) {
+			--Tetris::yoff;
 		}
 		Tetris::draw();
 	}

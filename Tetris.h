@@ -9,6 +9,10 @@ class Tetris {
 	int spawnTetromino();
 	int xoff = 0;
 	int yoff = 0;
+	bool left = false;
+	bool right = false;
+	bool down = false;
+	bool up = false;
 	void draw();
 	public:
 		void loop();
