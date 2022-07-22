@@ -8,6 +8,6 @@
 int main(int argc, char *argv[])
 {
 	Tetris game = Tetris(WIDTH, HEIGHT);
-	SDL_Quit();
+	game.loop();
 	return 0;
 }

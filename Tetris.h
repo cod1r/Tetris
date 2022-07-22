@@ -7,9 +7,11 @@ class Tetris {
 	SDL_Window *window = nullptr;
 	int speed = 1000;
 	int spawnTetromino();
-	void loop();
+	int xoff = 0;
+	int yoff = 0;
 	void draw();
 	public:
+		void loop();
 		Tetris(int, int);
 		~Tetris();
 };
