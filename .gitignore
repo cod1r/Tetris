@@ -1,2 +1,4 @@
 **/*.out
 .ccls-cache/
+**/*.run
+**/*.o

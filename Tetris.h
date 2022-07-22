@@ -5,11 +5,12 @@
 class Tetris {
 	std::vector<std::vector<int>> playfield;
 	SDL_Window *window = nullptr;
-	int TICK = 1000;
+	int speed = 1000;
 	int spawnTetromino();
+	void loop();
+	void draw();
 	public:
 		Tetris(int, int);
-		void loop();
 		~Tetris();
 };
 #endif
