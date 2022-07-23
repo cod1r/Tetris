@@ -21,7 +21,7 @@ class Tetris {
 	// I J L O S T Z
 	std::array<Tetromino, 7> Tetrominos;
 	Tetromino currentTetromino;
-	const int blocksize = 20;
+	const int blocksize = 25;
 	const int TETRIS_PLAYFIELD_WIDTH = 10;
 	const int TETRIS_PLAYFIELD_HEIGHT = 20;
 	const int TETROMINO_SIZE = 4;

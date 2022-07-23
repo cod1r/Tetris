@@ -176,7 +176,7 @@ void Tetris::loop()
 		}
 		if (Tetris::down) {
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				if (Tetris::currentTetromino.second.at(i).second < Tetris::TETRIS_PLAYFIELD_HEIGHT)
+				if (Tetris::currentTetromino.second.at(i).second * Tetris::blocksize < Tetris::TETRIS_PLAYFIELD_HEIGHT * Tetris::blocksize - Tetris::blocksize)
 					++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
@@ -191,8 +191,13 @@ void Tetris::draw()
 {
 	SDL_Surface *s = SDL_GetWindowSurface(Tetris::window);
 	SDL_FillRect(s, NULL, SDL_MapRGB(s->format, 0, 0, 0));
-	SDL_Rect playfield_area{};
-	SDL_FillRect(s, &playfield_area, SDL_MapRGB(s->format, 20, 20, 20));
+	SDL_Rect playfield_area{
+		Tetris::xleftborder,
+		0,
+		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH,
+		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_HEIGHT
+	};
+	SDL_FillRect(s, &playfield_area, SDL_MapRGB(s->format, 100, 100, 100));
 	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 		SDL_Rect temp{
 			Tetris::xleftborder + Tetris::blocksize * Tetris::currentTetromino.second.at(i).first,
