@@ -32,10 +32,10 @@ Tetris::Tetris(int width, int height)
 				139
 			},
 			std::array<std::pair<int, int>, 4>{
-				std::pair<int, int>{2, 1},
-				std::pair<int, int>{3, 1},
+				std::pair<int, int>{2, 0},
+				std::pair<int, int>{3, 0},
+				std::pair<int, int>{4, 0},
 				std::pair<int, int>{4, 1},
-				std::pair<int, int>{4, 2},
 			}
 		};
 	Tetris::Tetrominos[Tetris::J] = \
@@ -176,7 +176,8 @@ void Tetris::loop()
 		}
 		if (Tetris::down) {
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				++Tetris::currentTetromino.second.at(i).second;
+				if (Tetris::currentTetromino.second.at(i).second < Tetris::TETRIS_PLAYFIELD_HEIGHT)
+					++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
 		if (Tetris::space) {
@@ -190,10 +191,12 @@ void Tetris::draw()
 {
 	SDL_Surface *s = SDL_GetWindowSurface(Tetris::window);
 	SDL_FillRect(s, NULL, SDL_MapRGB(s->format, 0, 0, 0));
+	SDL_Rect playfield_area{};
+	SDL_FillRect(s, &playfield_area, SDL_MapRGB(s->format, 20, 20, 20));
 	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 		SDL_Rect temp{
-			Tetris::xleftborder + Tetris::blocksize * i + Tetris::currentTetromino.second.at(i).first,
-			Tetris::blocksize + Tetris::currentTetromino.second.at(i).second,
+			Tetris::xleftborder + Tetris::blocksize * Tetris::currentTetromino.second.at(i).first,
+			Tetris::blocksize * Tetris::currentTetromino.second.at(i).second,
 			Tetris::blocksize,
 			Tetris::blocksize
 		};
