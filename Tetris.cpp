@@ -3,6 +3,10 @@
 #include <SDL2/SDL.h>
 #include <stdexcept>
 #include <chrono>
+#include <functional>
+#include <climits>
+#include <random>
+#include <set>
 #include "Tetris.h"
 
 Tetris::Tetris(int width, int height)
@@ -131,8 +135,8 @@ Tetris::Tetris(int width, int height)
 		0
 	);
 	Tetris::renderer = SDL_CreateRenderer(window, -1, 0);
-	// TODO: randomize currentTetromino
-	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::I];
+	Tetris::generateSequence();
+	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::sequence.at(0)];
 	Tetris::xleftborder = \
 		(width - Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH) / 2;
 	Tetris::xrightborder = \
@@ -140,10 +144,57 @@ Tetris::Tetris(int width, int height)
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);
 }
 
+void Tetris::generateSequence()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distrib(0, 6);
+	std::set<int> seen;
+	Tetris::sequence_index = 0;
+	while (seen.size() < 7) {
+		int a = distrib(gen);
+		if (!seen.contains(a)) {
+			seen.insert(a);
+			Tetris::sequence.at(Tetris::sequence_index++) = a;
+		}
+	}
+}
+
+int Tetris::farLR(bool SIDE)
+{
+	int far = (SIDE ? INT_MIN:INT_MAX);
+	if (!SIDE) {
+		for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+			far = SDL_min(far, Tetris::currentTetromino.second.at(i).first);
+		}
+	} else if (SIDE) {
+		for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+			far = SDL_max(far, Tetris::currentTetromino.second.at(i).first);
+		}
+	}
+	return far;
+}
+
+int Tetris::farUD(bool SIDE)
+{
+	int far = (SIDE ? INT_MIN:INT_MAX);
+	if (!SIDE) {
+		for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+			far = SDL_min(far, Tetris::currentTetromino.second.at(i).second);
+		}
+	} else if (SIDE) {
+		for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+			far = SDL_max(far, Tetris::currentTetromino.second.at(i).second);
+		}
+	}
+	return far;
+}
+
 void Tetris::loop()
 {
 	SDL_Event e;
 	std::chrono::time_point<std::chrono::system_clock> prev = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> lastInputTime = std::chrono::system_clock::now();
 	bool quit = false;
 	while (!quit || Tetris::level > Tetris::MAX_LEVELS) {
 		while (SDL_PollEvent(&e)) {
@@ -181,32 +232,49 @@ void Tetris::loop()
 					break;
 			}
 		}
-		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
-		bool right_time = std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level - 1);
 		if (Tetris::up) {
 			// TODO: rotate the currentTetromino. consider wall kicks as well
 		}
-		if (Tetris::left && right_time) {
+		if (
+				Tetris::left &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				Tetris::farLR(false) > 0
+		) {
+			lastInputTime = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				if (Tetris::currentTetromino.second.at(i).first > Tetris::xleftborder)
-					--Tetris::currentTetromino.second.at(i).first;
+				--Tetris::currentTetromino.second.at(i).first;
 			}
 		}
-		if (Tetris::right && right_time) {
+		if (
+				Tetris::right &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				Tetris::farLR(true) < Tetris::TETRIS_PLAYFIELD_WIDTH - 1
+		) {
+			lastInputTime = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				if (Tetris::currentTetromino.second.at(i).first < Tetris::xrightborder)
-					++Tetris::currentTetromino.second.at(i).first;
+				++Tetris::currentTetromino.second.at(i).first;
 			}
 		}
-		if (Tetris::down && right_time) {
+		if (
+				Tetris::down &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				Tetris::farUD(true) < Tetris::TETRIS_PLAYFIELD_HEIGHT - 1
+		) {
+			lastInputTime = std::chrono::system_clock::now();
+			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+				++Tetris::currentTetromino.second.at(i).second;
+			}
 		}
 		if (Tetris::space) {
 
 		}
-		if (right_time) {
-			prev = curr;
+		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
+		bool right_time = \
+			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level - 1);
+		if (right_time && !Tetris::down) {
+			prev = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				if (Tetris::currentTetromino.second.at(i).second * Tetris::blocksize < Tetris::TETRIS_PLAYFIELD_HEIGHT * Tetris::blocksize - Tetris::blocksize)
+				if (Tetris::currentTetromino.second.at(i).second < Tetris::TETRIS_PLAYFIELD_HEIGHT - 1)
 					++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
@@ -234,7 +302,7 @@ void Tetris::draw()
 			std::get<2>(Tetris::currentTetromino.first),
 			255
 		);
-		SDL_Rect temp{
+		SDL_Rect temp {
 			Tetris::xleftborder + Tetris::blocksize * Tetris::currentTetromino.second.at(i).first,
 			Tetris::blocksize * Tetris::currentTetromino.second.at(i).second,
 			Tetris::blocksize,
@@ -247,6 +315,7 @@ void Tetris::draw()
 
 Tetris::~Tetris()
 {
+	SDL_DestroyRenderer(Tetris::renderer);
 	SDL_DestroyWindow(Tetris::window);
 	SDL_Quit();
 }

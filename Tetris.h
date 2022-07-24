@@ -22,22 +22,28 @@ class Tetris {
 	// I J L O S T Z
 	std::array<Tetromino, 7> Tetrominos;
 	std::array<double, 15> LevelSpeed; 
+	std::array<int, 7> sequence;
 	Tetromino currentTetromino;
 	const int blocksize = 25;
 	const int TETRIS_PLAYFIELD_WIDTH = 10;
 	const int TETRIS_PLAYFIELD_HEIGHT = 20;
 	const int TETROMINO_SIZE = 4;
 	const int MAX_LEVELS = 15;
+	int sequence_index = 0;
 	int xleftborder;
 	int xrightborder;
 	int level = 1;
 	int lines_cleared = 0;
+	double SOFT_MOVE_SPEED = .1;
 	bool left = false;
 	bool right = false;
 	bool down = false;
 	bool up = false;
 	bool space = false;
 	void draw();
+	int farLR(bool);
+	int farUD(bool);
+	void generateSequence();
 	public:
 		void loop();
 		Tetris(int, int);

@@ -2,8 +2,8 @@
 #include <string>
 #include <iostream>
 #include "Tetris.h"
-#define WIDTH 400
-#define HEIGHT 600
+#define WIDTH 250
+#define HEIGHT 500
 
 int main(int argc, char *argv[])
 {
