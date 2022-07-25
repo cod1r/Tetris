@@ -248,8 +248,11 @@ void Tetris::loop()
 {
 	SDL_Event e;
 	std::chrono::time_point<std::chrono::system_clock> prev = std::chrono::system_clock::now();
-	std::chrono::time_point<std::chrono::system_clock> lastInputTime = std::chrono::system_clock::now();
-	std::chrono::time_point<std::chrono::system_clock> collideTime = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> lastInputTimeDown = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> lastInputTimeLeft = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> lastInputTimeRight = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> collideTime;
+	bool collided = false;
 	bool quit = false;
 	while (!quit || Tetris::level > Tetris::MAX_LEVELS) {
 		while (SDL_PollEvent(&e)) {
@@ -292,30 +295,30 @@ void Tetris::loop()
 		}
 		if (
 				Tetris::left &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeLeft).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkLeft()
 		) {
-			lastInputTime = std::chrono::system_clock::now();
+			lastInputTimeLeft = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				--Tetris::currentTetromino.second.at(i).first;
 			}
 		}
 		if (
 				Tetris::right &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeRight).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkRight()
 		) {
-			lastInputTime = std::chrono::system_clock::now();
+			lastInputTimeRight = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).first;
 			}
 		}
 		if (
 				Tetris::down &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTime).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeDown).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkDOWN()
 		) {
-			lastInputTime = std::chrono::system_clock::now();
+			lastInputTimeDown = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).second;
 			}
@@ -323,20 +326,25 @@ void Tetris::loop()
 		if (Tetris::space) {
 
 		}
+
 		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
 		bool right_time = \
 			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level - 1);
+
 		if (right_time && !Tetris::down && Tetris::checkDOWN()) {
 			prev = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
-		if (Tetris::checkCollision()) {
-			if (std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {
-				collideTime = std::chrono::system_clock::now();
-				lock();
-			}
+		if (Tetris::checkCollision() && !collided) {
+			collided = true;
+			collideTime = std::chrono::system_clock::now();
+		}
+		if (collided && std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {
+			collideTime = std::chrono::system_clock::now();
+			lock();
+			collided = false;
 		}
 		Tetris::checkLineClear();
 		Tetris::draw();
