@@ -5,6 +5,8 @@
 #ifndef _TETRIS_H
 #define _TETRIS_H
 class Tetris {
+	// coords are stored in X, Y format
+	// which might be confusing as every matrix is accessed as Y, X or ROW, COLUMN
 	typedef std::pair<std::tuple<int, int, int>,
 					std::array<std::pair<int, int>, 4>> Tetromino;
 	enum TetrominoType {
@@ -35,15 +37,19 @@ class Tetris {
 	int level = 1;
 	int lines_cleared = 0;
 	double SOFT_MOVE_SPEED = .1;
+	double LOCK_DELAY = .5;
 	bool left = false;
 	bool right = false;
 	bool down = false;
 	bool up = false;
 	bool space = false;
 	void draw();
-	int farLR(bool);
-	int farUD(bool);
+	bool checkLeft();
+	bool checkRight();
+	bool checkDOWN();
 	bool checkCollision();
+	void lock();
+	void checkLineClear();
 	void generateSequence();
 	public:
 		void loop();
