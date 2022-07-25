@@ -43,6 +43,7 @@ class Tetris {
 	void draw();
 	int farLR(bool);
 	int farUD(bool);
+	bool checkCollision();
 	void generateSequence();
 	public:
 		void loop();

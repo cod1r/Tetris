@@ -12,8 +12,8 @@
 Tetris::Tetris(int width, int height)
 {
 	Tetris::playfield = \
-		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_WIDTH,
-				std::vector<int>(Tetris::TETRIS_PLAYFIELD_HEIGHT, 0));
+		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_HEIGHT,
+				std::vector<int>(Tetris::TETRIS_PLAYFIELD_WIDTH, -1));
 	Tetris::Tetrominos[Tetris::I] = Tetris::Tetromino {
 		std::tuple<int, int, int>{
 			173,
@@ -34,10 +34,10 @@ Tetris::Tetris(int width, int height)
 			139
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 0},
-			std::pair<int, int>{3, 0},
-			std::pair<int, int>{4, 0},
+			std::pair<int, int>{2, 1},
+			std::pair<int, int>{3, 1},
 			std::pair<int, int>{4, 1},
+			std::pair<int, int>{4, 0},
 		}
 	};
 	Tetris::Tetrominos[Tetris::J] = Tetris::Tetromino {
@@ -136,7 +136,7 @@ Tetris::Tetris(int width, int height)
 	);
 	Tetris::renderer = SDL_CreateRenderer(window, -1, 0);
 	Tetris::generateSequence();
-	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::sequence.at(0)];
+	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::sequence.at(Tetris::sequence_index)];
 	Tetris::xleftborder = \
 		(width - Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH) / 2;
 	Tetris::xrightborder = \
@@ -144,20 +144,41 @@ Tetris::Tetris(int width, int height)
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);
 }
 
+bool Tetris::checkCollision()
+{
+	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+		if (Tetris::currentTetromino.second.at(i).second + 1 == Tetris::TETRIS_PLAYFIELD_HEIGHT ||
+				(Tetris::currentTetromino.second.at(i).second + 1 < Tetris::TETRIS_PLAYFIELD_HEIGHT &&
+				Tetris::playfield[Tetris::currentTetromino.second.at(i).second + 1][Tetris::currentTetromino.second.at(i).first] != -1)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Tetris::generateSequence()
 {
+	std::cout << Tetris::sequence_index << std::endl;
+	for (int i = 0; i < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++i) {
+		for (int j = 0; j < Tetris::TETRIS_PLAYFIELD_WIDTH; ++j) {
+			std::cout << Tetris::playfield[i][j] << ' ';
+		}
+		std::cout << std::endl;
+	}
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(0, 6);
 	std::set<int> seen;
-	Tetris::sequence_index = 0;
+	int temp_sequence_index = 0;
 	while (seen.size() < 7) {
 		int a = distrib(gen);
 		if (!seen.contains(a)) {
 			seen.insert(a);
-			Tetris::sequence.at(Tetris::sequence_index++) = a;
+			Tetris::sequence.at(temp_sequence_index++) = a;
 		}
 	}
+	for (int i : Tetris::sequence)
+		std::cout << i << std::endl;
 }
 
 int Tetris::farLR(bool SIDE)
@@ -271,12 +292,23 @@ void Tetris::loop()
 		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
 		bool right_time = \
 			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level - 1);
-		if (right_time && !Tetris::down) {
+		if (right_time && !Tetris::down && Tetris::farUD(true) < Tetris::TETRIS_PLAYFIELD_HEIGHT - 1) {
 			prev = std::chrono::system_clock::now();
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				if (Tetris::currentTetromino.second.at(i).second < Tetris::TETRIS_PLAYFIELD_HEIGHT - 1)
-					++Tetris::currentTetromino.second.at(i).second;
+				++Tetris::currentTetromino.second.at(i).second;
 			}
+		}
+		if (Tetris::checkCollision()) {
+			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+				Tetris::playfield[Tetris::currentTetromino.second.at(i).second][Tetris::currentTetromino.second.at(i).first] = \
+					Tetris::sequence.at(Tetris::sequence_index);
+			}
+			++Tetris::sequence_index;
+			if (Tetris::sequence_index == 7) {
+				Tetris::generateSequence();
+				Tetris::sequence_index = 0;
+			}
+			Tetris::currentTetromino = Tetris::Tetrominos.at(Tetris::sequence.at(Tetris::sequence_index));
 		}
 		Tetris::draw();
 	}
@@ -287,13 +319,17 @@ void Tetris::draw()
 	SDL_SetRenderDrawColor(Tetris::renderer, 0, 0, 0, 255);
 	SDL_RenderClear(Tetris::renderer);
 	SDL_SetRenderDrawColor(Tetris::renderer, 100, 100, 100, 255);
-	SDL_Rect playfield_area{
+	SDL_Rect playfield_area {
 		Tetris::xleftborder,
 		0,
 		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH,
 		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_HEIGHT
 	};
 	SDL_RenderFillRect(Tetris::renderer, &playfield_area);
+	for (int i = 0; i < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++i) {
+		for (int j = 0; j < Tetris::TETRIS_PLAYFIELD_WIDTH; ++j) {
+		}
+	}
 	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 		SDL_SetRenderDrawColor(
 			Tetris::renderer,
