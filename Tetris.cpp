@@ -158,13 +158,6 @@ bool Tetris::checkCollision()
 
 void Tetris::generateSequence()
 {
-	std::cout << Tetris::sequence_index << std::endl;
-	for (int i = 0; i < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++i) {
-		for (int j = 0; j < Tetris::TETRIS_PLAYFIELD_WIDTH; ++j) {
-			std::cout << Tetris::playfield[i][j] << ' ';
-		}
-		std::cout << std::endl;
-	}
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distrib(0, 6);
@@ -177,8 +170,6 @@ void Tetris::generateSequence()
 			Tetris::sequence.at(temp_sequence_index++) = a;
 		}
 	}
-	for (int i : Tetris::sequence)
-		std::cout << i << std::endl;
 }
 
 int Tetris::farLR(bool SIDE)
@@ -326,8 +317,25 @@ void Tetris::draw()
 		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_HEIGHT
 	};
 	SDL_RenderFillRect(Tetris::renderer, &playfield_area);
+	SDL_SetRenderDrawColor(Tetris::renderer, 255, 255, 255, 255);
 	for (int i = 0; i < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++i) {
 		for (int j = 0; j < Tetris::TETRIS_PLAYFIELD_WIDTH; ++j) {
+			if (Tetris::playfield[i][j] != -1) {
+				SDL_SetRenderDrawColor(
+					Tetris::renderer,
+					std::get<0>(Tetris::Tetrominos.at(Tetris::playfield[i][j]).first),
+					std::get<1>(Tetris::Tetrominos.at(Tetris::playfield[i][j]).first),
+					std::get<2>(Tetris::Tetrominos.at(Tetris::playfield[i][j]).first),
+					255
+				);
+				SDL_Rect temp {
+					Tetris::xleftborder + Tetris::blocksize * j,
+					Tetris::blocksize * i,
+					Tetris::blocksize,
+					Tetris::blocksize
+				};
+				SDL_RenderFillRect(Tetris::renderer, &temp);
+			}
 		}
 	}
 	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
