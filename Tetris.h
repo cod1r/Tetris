@@ -26,6 +26,7 @@ class Tetris {
 	std::array<double, 15> LevelSpeed; 
 	std::array<int, 7> sequence;
 	Tetromino currentTetromino;
+	const int LINE_CLEAR_LEVELUP_AMOUNT = 10;
 	const int blocksize = 25;
 	const int TETRIS_PLAYFIELD_WIDTH = 10;
 	const int TETRIS_PLAYFIELD_HEIGHT = 20;
@@ -44,6 +45,7 @@ class Tetris {
 	bool up = false;
 	bool space = false;
 	void draw();
+	void hardDrop();
 	bool checkLeft();
 	bool checkRight();
 	bool checkDOWN();

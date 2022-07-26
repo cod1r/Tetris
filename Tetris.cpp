@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <stdexcept>
 #include <chrono>
-#include <functional>
 #include <climits>
 #include <random>
 #include <set>
@@ -144,6 +143,22 @@ Tetris::Tetris(int width, int height)
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);
 }
 
+void Tetris::hardDrop()
+{
+	int min_add = INT_MAX;
+	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+		min_add = SDL_min(min_add, Tetris::TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::currentTetromino.second.at(t).second);
+		for (int Y = Tetris::TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::currentTetromino.second.at(t).second; --Y) {
+			if (Tetris::playfield[Y][Tetris::currentTetromino.second.at(t).first] != -1) {
+				min_add = SDL_min(min_add, Y - Tetris::currentTetromino.second.at(t).second);
+			}
+		}
+	}
+	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+		Tetris::currentTetromino.second.at(t).second += min_add;
+	}
+}
+
 void Tetris::lock()
 {
 	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
@@ -191,6 +206,9 @@ void Tetris::checkLineClear()
 				}
 			}
 		}
+	}
+	if (Tetris::lines_cleared == Tetris::LINE_CLEAR_LEVELUP_AMOUNT) {
+		++Tetris::level;
 	}
 }
 
@@ -253,14 +271,16 @@ void Tetris::loop()
 	std::chrono::time_point<std::chrono::system_clock> lastInputTimeRight = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> collideTime;
 	bool collided = false;
-	bool quit = false;
-	while (!quit || Tetris::level > Tetris::MAX_LEVELS) {
+	// TODO: check if spawned tetromino is inside of a locked and dropped tetromino
+	// this means that the playfield is filled
+	while (Tetris::level <= Tetris::MAX_LEVELS) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
 				case SDL_KEYDOWN:
 					if (e.key.keysym.sym == SDLK_q) {
-						quit = true;
+						return;
 					} else if (e.key.keysym.sym == SDLK_SPACE) {
+						Tetris::space = true;
 					} else if (e.key.keysym.sym == SDLK_UP) {
 						Tetris::up = true;
 					} else if (e.key.keysym.sym == SDLK_RIGHT) {
@@ -269,8 +289,6 @@ void Tetris::loop()
 						Tetris::left = true;
 					} else if (e.key.keysym.sym == SDLK_DOWN) {
 						Tetris::down = true;
-					} else if (e.key.keysym.sym == SDLK_SPACE) {
-						Tetris::space = true;
 					}
 					break;
 				case SDL_KEYUP:
@@ -323,8 +341,9 @@ void Tetris::loop()
 				++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
-		if (Tetris::space) {
 
+		if (Tetris::space) {
+			Tetris::hardDrop();
 		}
 
 		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
@@ -337,6 +356,7 @@ void Tetris::loop()
 				++Tetris::currentTetromino.second.at(i).second;
 			}
 		}
+
 		if (Tetris::checkCollision() && !collided) {
 			collided = true;
 			collideTime = std::chrono::system_clock::now();
