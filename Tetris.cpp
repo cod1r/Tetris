@@ -150,7 +150,7 @@ void Tetris::hardDrop()
 		min_add = SDL_min(min_add, Tetris::TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::currentTetromino.second.at(t).second);
 		for (int Y = Tetris::TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::currentTetromino.second.at(t).second; --Y) {
 			if (Tetris::playfield[Y][Tetris::currentTetromino.second.at(t).first] != -1) {
-				min_add = SDL_min(min_add, Y - Tetris::currentTetromino.second.at(t).second);
+				min_add = SDL_min(min_add, Y - 1 - Tetris::currentTetromino.second.at(t).second);
 			}
 		}
 	}
