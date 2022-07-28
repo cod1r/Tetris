@@ -18,6 +18,12 @@ class Tetris {
 		T,
 		Z
 	};
+	enum TetrominoDirection {
+		DOWN,
+		UP,
+		LEFT,
+		RIGHT
+	};
 	std::vector<std::vector<int>> playfield;
 	SDL_Window *window = nullptr;
 	SDL_Renderer *renderer = nullptr;
@@ -26,6 +32,7 @@ class Tetris {
 	std::array<double, 15> LevelSpeed; 
 	std::array<int, 7> sequence;
 	Tetromino currentTetromino;
+	TetrominoDirection dir = DOWN;
 	const int LINE_CLEAR_LEVELUP_AMOUNT = 10;
 	const int blocksize = 25;
 	const int TETRIS_PLAYFIELD_WIDTH = 10;
@@ -46,6 +53,7 @@ class Tetris {
 	bool space = false;
 	void draw();
 	void hardDrop();
+	void rotate();
 	bool checkLeft();
 	bool checkRight();
 	bool checkDOWN();

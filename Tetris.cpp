@@ -143,6 +143,75 @@ Tetris::Tetris(int width, int height)
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);
 }
 
+void Tetris::rotate()
+{
+	Tetris::Tetromino tempT = Tetris::currentTetromino;
+	int mx = INT_MIN;
+	int my = INT_MIN;
+	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+		mx = SDL_max(mx, Tetris::currentTetromino.second.at(t).first);
+		my = SDL_max(my, Tetris::currentTetromino.second.at(t).second);
+	}
+	if (Tetris::sequence.at(Tetris::sequence_index) == Tetris::I) {
+		const int rotateMatrixSize = 4;
+		if (Tetris::dir == Tetris::DOWN) {
+			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+				tempT.second.at(t).first -= (mx - (rotateMatrixSize - 1));
+				tempT.second.at(t).second -= (my - 1);
+
+				int old_c = tempT.second.at(t).first;
+				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+				tempT.second.at(t).second = old_c;
+
+				tempT.second.at(t).first += (mx - (rotateMatrixSize - 1));
+				tempT.second.at(t).second += (my - 1);
+			}
+			Tetris::dir = Tetris::LEFT;
+		} else if (Tetris::dir == Tetris::UP) {
+			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+				tempT.second.at(t).first -= (mx - (rotateMatrixSize - 1));
+				tempT.second.at(t).second -= (my - 2);
+
+				int old_c = tempT.second.at(t).first;
+				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+				tempT.second.at(t).second = old_c;
+
+				tempT.second.at(t).first += (mx - (rotateMatrixSize - 1));
+				tempT.second.at(t).second += (my - 2);
+			}
+			Tetris::dir = Tetris::RIGHT;
+		} else if (Tetris::dir == Tetris::LEFT) {
+			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+				tempT.second.at(t).first -= (mx - 2);
+				tempT.second.at(t).second -= (my - (rotateMatrixSize - 1));
+
+				int old_c = tempT.second.at(t).first;
+				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+				tempT.second.at(t).second = old_c;
+
+				tempT.second.at(t).first += (mx - 2);
+				tempT.second.at(t).second += (my - (rotateMatrixSize - 1));
+			}
+			Tetris::dir = Tetris::UP;
+		} else if (Tetris::dir == Tetris::RIGHT) {
+			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+				tempT.second.at(t).first -= (mx - 1);
+				tempT.second.at(t).second -= (my - (rotateMatrixSize - 1));
+
+				int old_c = tempT.second.at(t).first;
+				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+				tempT.second.at(t).second = old_c;
+
+				tempT.second.at(t).first += (mx - 1);
+				tempT.second.at(t).second += (my - (rotateMatrixSize - 1));
+			}
+			Tetris::dir = Tetris::DOWN;
+		}
+	} else if (Tetris::sequence.at(Tetris::sequence_index) != Tetris::O) {
+	}
+	Tetris::currentTetromino = tempT;
+}
+
 void Tetris::hardDrop()
 {
 	int min_add = INT_MAX;
@@ -269,6 +338,7 @@ void Tetris::loop()
 	std::chrono::time_point<std::chrono::system_clock> lastInputTimeDown = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> lastInputTimeLeft = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> lastInputTimeRight = std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> lastInputTimeUp = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> collideTime;
 	bool collided = false;
 	// TODO: check if spawned tetromino is inside of a locked and dropped tetromino
@@ -308,8 +378,12 @@ void Tetris::loop()
 					break;
 			}
 		}
-		if (Tetris::up) {
+		if (Tetris::up &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeUp).count() >= Tetris::SOFT_MOVE_SPEED
+		) {
 			// TODO: rotate the currentTetromino. consider wall kicks as well
+			lastInputTimeUp = std::chrono::system_clock::now();
+			Tetris::rotate();
 		}
 		if (
 				Tetris::left &&
@@ -363,7 +437,7 @@ void Tetris::loop()
 		}
 		if (collided && std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {
 			collideTime = std::chrono::system_clock::now();
-			lock();
+			Tetris::lock();
 			collided = false;
 		}
 		Tetris::checkLineClear();

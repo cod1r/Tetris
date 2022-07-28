@@ -2,6 +2,8 @@
 
 ## Using SDL2 and C++ to make a tetris game :)
 
+## To start, run the executable
+
 ## Controls
 
  - `q`, to quit
@@ -19,3 +21,9 @@
 ## Considerations
 
 - This was only tested and ran on Linux and not on any other platforms such as Windows or MacOS
+- There is no scoring system.
+- There is no sound.
+- No starting menu.
+- No pause screen.
+- No adjustable settings.
+- No textures.
