@@ -192,7 +192,6 @@ void Tetris::rotate()
 			tempT.second.at(t).second += std::get<3>(tempT.first).second;
 		}
 	}
-	// TODO: check for kicks from our locked tetrominos
 	bool swappable = true;
 	int miny = INT_MAX;
 	int maxy = INT_MIN;
@@ -227,7 +226,8 @@ void Tetris::rotate()
 		if (p.first < 0 ||
 				p.first >= Tetris::TETRIS_PLAYFIELD_WIDTH ||
 				p.second < 0 ||
-				p.second >= Tetris::TETRIS_PLAYFIELD_HEIGHT
+				p.second >= Tetris::TETRIS_PLAYFIELD_HEIGHT ||
+				Tetris::playfield[p.second][p.first] != -1
 		) {
 			swappable = false;
 		}
@@ -368,8 +368,6 @@ void Tetris::loop()
 	std::chrono::time_point<std::chrono::system_clock> lastInputTimeUp = std::chrono::system_clock::now();
 	std::chrono::time_point<std::chrono::system_clock> collideTime;
 	bool collided = false;
-	// TODO: check if spawned tetromino is inside of a locked and dropped tetromino
-	// this means that the playfield is filled
 	while (Tetris::level < Tetris::MAX_LEVELS && Tetris::checkFill()) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
