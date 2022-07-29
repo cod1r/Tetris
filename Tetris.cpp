@@ -151,6 +151,16 @@ Tetris::Tetris(int width, int height)
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);
 }
 
+bool Tetris::checkFill()
+{
+	for (std::pair<int, int> p : Tetris::currentTetromino.second) {
+		if (Tetris::playfield[p.second][p.first] != -1) {
+			return false;
+		}
+	}
+	return true;
+}
+
 void Tetris::rotate()
 {
 	Tetris::Tetromino tempT = Tetris::currentTetromino;
@@ -182,6 +192,7 @@ void Tetris::rotate()
 			tempT.second.at(t).second += std::get<3>(tempT.first).second;
 		}
 	}
+	// TODO: check for kicks from our locked tetrominos
 	bool swappable = true;
 	int miny = INT_MAX;
 	int maxy = INT_MIN;
@@ -359,7 +370,7 @@ void Tetris::loop()
 	bool collided = false;
 	// TODO: check if spawned tetromino is inside of a locked and dropped tetromino
 	// this means that the playfield is filled
-	while (Tetris::level < Tetris::MAX_LEVELS) {
+	while (Tetris::level < Tetris::MAX_LEVELS && Tetris::checkFill()) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
 				case SDL_KEYDOWN:

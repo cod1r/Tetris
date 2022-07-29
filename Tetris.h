@@ -56,6 +56,7 @@ class Tetris {
 	bool checkRight();
 	bool checkDOWN();
 	bool checkCollision();
+	bool checkFill();
 	void lock();
 	void checkLineClear();
 	void generateSequence();
