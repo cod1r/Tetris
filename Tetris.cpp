@@ -182,7 +182,48 @@ void Tetris::rotate()
 			tempT.second.at(t).second += std::get<3>(tempT.first).second;
 		}
 	}
-	Tetris::currentTetromino = tempT;
+	bool swappable = true;
+	int miny = INT_MAX;
+	int maxy = INT_MIN;
+	int minx = INT_MAX;
+	int maxx = INT_MIN;
+	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+		miny = SDL_min(miny, tempT.second.at(t).second);
+		maxy = SDL_max(maxy, tempT.second.at(t).second);
+		minx = SDL_min(minx, tempT.second.at(t).first);
+		maxx = SDL_max(maxx, tempT.second.at(t).first);
+	}
+	if (miny < 0) {
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).second += SDL_abs(miny);
+		}
+	} else if (maxy >= Tetris::TETRIS_PLAYFIELD_HEIGHT) {
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).second -= SDL_abs(maxy - (Tetris::TETRIS_PLAYFIELD_HEIGHT - 1));
+		}
+	}
+
+	if (minx < 0) {
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).first += SDL_abs(minx);
+		}
+	} else if (maxx >= Tetris::TETRIS_PLAYFIELD_WIDTH) {
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).first -= SDL_abs(maxx - (Tetris::TETRIS_PLAYFIELD_WIDTH - 1));
+		}
+	}
+	for (std::pair<int, int> p : tempT.second) {
+		if (p.first < 0 ||
+				p.first >= Tetris::TETRIS_PLAYFIELD_WIDTH ||
+				p.second < 0 ||
+				p.second >= Tetris::TETRIS_PLAYFIELD_HEIGHT
+		) {
+			swappable = false;
+		}
+	}
+	if (swappable) {
+		Tetris::currentTetromino = tempT;
+	}
 }
 
 void Tetris::hardDrop()
