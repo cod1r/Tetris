@@ -15,7 +15,7 @@
 
 ## Build
 
-- Install SD2
+- Install SDL2
 - Run `make` using the provided Makefile
 
 ## Considerations
