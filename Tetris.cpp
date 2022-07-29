@@ -14,10 +14,11 @@ Tetris::Tetris(int width, int height)
 		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_HEIGHT,
 				std::vector<int>(Tetris::TETRIS_PLAYFIELD_WIDTH, -1));
 	Tetris::Tetrominos[Tetris::I] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			173,
 			216,
-			230
+			230,
+			std::pair<int, int> {3, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{3, 1},
@@ -27,10 +28,11 @@ Tetris::Tetris(int width, int height)
 		}
 	};
 	Tetris::Tetrominos[Tetris::L] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			0,
 			0,
-			139
+			139,
+			std::pair<int, int> {2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{2, 1},
@@ -40,10 +42,11 @@ Tetris::Tetris(int width, int height)
 		}
 	};
 	Tetris::Tetrominos[Tetris::J] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			240,
 			165,
-			0
+			0,
+			std::pair<int, int>{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{2, 0},
@@ -52,11 +55,13 @@ Tetris::Tetris(int width, int height)
 			std::pair<int, int>{4, 1},
 		}
 	};
+	// O doesn't need to be rotated
 	Tetris::Tetrominos[Tetris::O] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			255,
 			255,
-			0
+			0,
+			std::pair<int, int>{3, -1}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{4, 0},
@@ -66,10 +71,11 @@ Tetris::Tetris(int width, int height)
 		}
 	};
 	Tetris::Tetrominos[Tetris::T] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			128,
 			0,
 			128,
+			std::pair<int, int>{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{2, 1},
@@ -79,10 +85,11 @@ Tetris::Tetris(int width, int height)
 		}
 	};
 	Tetris::Tetrominos[Tetris::S] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			0,
 			255,
-			0
+			0,
+			std::pair<int, int>{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{2, 1},
@@ -92,10 +99,11 @@ Tetris::Tetris(int width, int height)
 		}
 	};
 	Tetris::Tetrominos[Tetris::Z] = Tetris::Tetromino {
-		std::tuple<int, int, int>{
+		std::tuple<int, int, int, std::pair<int, int>>{
 			255,
 			0,
-			0
+			0,
+			std::pair<int, int>{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
 			std::pair<int, int>{2, 0},
@@ -146,68 +154,33 @@ Tetris::Tetris(int width, int height)
 void Tetris::rotate()
 {
 	Tetris::Tetromino tempT = Tetris::currentTetromino;
-	int mx = INT_MIN;
-	int my = INT_MIN;
-	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-		mx = SDL_max(mx, Tetris::currentTetromino.second.at(t).first);
-		my = SDL_max(my, Tetris::currentTetromino.second.at(t).second);
-	}
-	if (Tetris::sequence.at(Tetris::sequence_index) == Tetris::I) {
+	if (Tetris::sequence.at(Tetris::sequence_index) == Tetris::I ||
+			Tetris::sequence.at(Tetris::sequence_index) == Tetris::O) {
 		const int rotateMatrixSize = 4;
-		if (Tetris::dir == Tetris::DOWN) {
-			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-				tempT.second.at(t).first -= (mx - (rotateMatrixSize - 1));
-				tempT.second.at(t).second -= (my - 1);
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).first -= std::get<3>(tempT.first).first;
+			tempT.second.at(t).second -= std::get<3>(tempT.first).second;
 
-				int old_c = tempT.second.at(t).first;
-				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-				tempT.second.at(t).second = old_c;
+			int old_c = tempT.second.at(t).first;
+			tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+			tempT.second.at(t).second = old_c;
 
-				tempT.second.at(t).first += (mx - (rotateMatrixSize - 1));
-				tempT.second.at(t).second += (my - 1);
-			}
-			Tetris::dir = Tetris::LEFT;
-		} else if (Tetris::dir == Tetris::UP) {
-			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-				tempT.second.at(t).first -= (mx - (rotateMatrixSize - 1));
-				tempT.second.at(t).second -= (my - 2);
-
-				int old_c = tempT.second.at(t).first;
-				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-				tempT.second.at(t).second = old_c;
-
-				tempT.second.at(t).first += (mx - (rotateMatrixSize - 1));
-				tempT.second.at(t).second += (my - 2);
-			}
-			Tetris::dir = Tetris::RIGHT;
-		} else if (Tetris::dir == Tetris::LEFT) {
-			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-				tempT.second.at(t).first -= (mx - 2);
-				tempT.second.at(t).second -= (my - (rotateMatrixSize - 1));
-
-				int old_c = tempT.second.at(t).first;
-				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-				tempT.second.at(t).second = old_c;
-
-				tempT.second.at(t).first += (mx - 2);
-				tempT.second.at(t).second += (my - (rotateMatrixSize - 1));
-			}
-			Tetris::dir = Tetris::UP;
-		} else if (Tetris::dir == Tetris::RIGHT) {
-			for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-				tempT.second.at(t).first -= (mx - 1);
-				tempT.second.at(t).second -= (my - (rotateMatrixSize - 1));
-
-				int old_c = tempT.second.at(t).first;
-				tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-				tempT.second.at(t).second = old_c;
-
-				tempT.second.at(t).first += (mx - 1);
-				tempT.second.at(t).second += (my - (rotateMatrixSize - 1));
-			}
-			Tetris::dir = Tetris::DOWN;
+			tempT.second.at(t).first += std::get<3>(tempT.first).first;
+			tempT.second.at(t).second += std::get<3>(tempT.first).second;
 		}
-	} else if (Tetris::sequence.at(Tetris::sequence_index) != Tetris::O) {
+	} else {
+		const int rotateMatrixSize = 3;
+		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
+			tempT.second.at(t).first -= std::get<3>(tempT.first).first;
+			tempT.second.at(t).second -= std::get<3>(tempT.first).second;
+
+			int old_c = tempT.second.at(t).first;
+			tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
+			tempT.second.at(t).second = old_c;
+
+			tempT.second.at(t).first += std::get<3>(tempT.first).first;
+			tempT.second.at(t).second += std::get<3>(tempT.first).second;
+		}
 	}
 	Tetris::currentTetromino = tempT;
 }
@@ -223,6 +196,7 @@ void Tetris::hardDrop()
 			}
 		}
 	}
+	std::get<3>(Tetris::currentTetromino.first).second += min_add;
 	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
 		Tetris::currentTetromino.second.at(t).second += min_add;
 	}
@@ -379,7 +353,8 @@ void Tetris::loop()
 			}
 		}
 		if (Tetris::up &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeUp).count() >= Tetris::SOFT_MOVE_SPEED
+				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+					lastInputTimeUp).count() >= Tetris::SOFT_MOVE_SPEED
 		) {
 			// TODO: rotate the currentTetromino. consider wall kicks as well
 			lastInputTimeUp = std::chrono::system_clock::now();
@@ -387,30 +362,36 @@ void Tetris::loop()
 		}
 		if (
 				Tetris::left &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeLeft).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+					lastInputTimeLeft).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkLeft()
 		) {
 			lastInputTimeLeft = std::chrono::system_clock::now();
+			--std::get<3>(Tetris::currentTetromino.first).first;
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				--Tetris::currentTetromino.second.at(i).first;
 			}
 		}
 		if (
 				Tetris::right &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeRight).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+					lastInputTimeRight).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkRight()
 		) {
 			lastInputTimeRight = std::chrono::system_clock::now();
+			++std::get<3>(Tetris::currentTetromino.first).first;
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).first;
 			}
 		}
 		if (
 				Tetris::down &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - lastInputTimeDown).count() >= Tetris::SOFT_MOVE_SPEED &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+					lastInputTimeDown).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::checkDOWN()
 		) {
 			lastInputTimeDown = std::chrono::system_clock::now();
+			++std::get<3>(Tetris::currentTetromino.first).second;
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).second;
 			}
@@ -426,6 +407,7 @@ void Tetris::loop()
 
 		if (right_time && !Tetris::down && Tetris::checkDOWN()) {
 			prev = std::chrono::system_clock::now();
+			++std::get<3>(Tetris::currentTetromino.first).second;
 			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
 				++Tetris::currentTetromino.second.at(i).second;
 			}
@@ -435,7 +417,8 @@ void Tetris::loop()
 			collided = true;
 			collideTime = std::chrono::system_clock::now();
 		}
-		if (collided && std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {
+		if (collided &&
+				std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {
 			collideTime = std::chrono::system_clock::now();
 			Tetris::lock();
 			collided = false;
