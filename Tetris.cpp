@@ -293,6 +293,7 @@ void Tetris::checkLineClear()
 	}
 	if (Tetris::lines_cleared == Tetris::LINE_CLEAR_LEVELUP_AMOUNT) {
 		++Tetris::level;
+		Tetris::lines_cleared = 0;
 	}
 }
 
@@ -358,7 +359,7 @@ void Tetris::loop()
 	bool collided = false;
 	// TODO: check if spawned tetromino is inside of a locked and dropped tetromino
 	// this means that the playfield is filled
-	while (Tetris::level <= Tetris::MAX_LEVELS) {
+	while (Tetris::level < Tetris::MAX_LEVELS) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {
 				case SDL_KEYDOWN:
@@ -397,7 +398,6 @@ void Tetris::loop()
 				std::chrono::duration<double>(std::chrono::system_clock::now() - \
 					lastInputTimeUp).count() >= Tetris::SOFT_MOVE_SPEED
 		) {
-			// TODO: rotate the currentTetromino. consider wall kicks as well
 			lastInputTimeUp = std::chrono::system_clock::now();
 			Tetris::rotate();
 		}
@@ -444,7 +444,7 @@ void Tetris::loop()
 
 		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
 		bool right_time = \
-			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level - 1);
+			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level);
 
 		if (right_time && !Tetris::down && Tetris::checkDOWN()) {
 			prev = std::chrono::system_clock::now();

@@ -40,7 +40,7 @@ class Tetris {
 	int sequence_index = 0;
 	int xleftborder;
 	int xrightborder;
-	int level = 1;
+	int level = 0;
 	int lines_cleared = 0;
 	double SOFT_MOVE_SPEED = .1;
 	double LOCK_DELAY = .5;
