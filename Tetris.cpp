@@ -405,7 +405,7 @@ void Tetris::loop()
 		}
 		if (Tetris::up &&
 				std::chrono::duration<double>(std::chrono::system_clock::now() - \
-					lastInputTimeUp).count() >= Tetris::SOFT_MOVE_SPEED
+					lastInputTimeUp).count() >= Tetris::ROTATE_SPEED
 		) {
 			lastInputTimeUp = std::chrono::system_clock::now();
 			Tetris::rotate();
@@ -463,9 +463,13 @@ void Tetris::loop()
 			}
 		}
 
-		if (Tetris::checkCollision() && !collided) {
+		if (Tetris::checkCollision()) {
+			if (!collided) {
+				collideTime = std::chrono::system_clock::now();
+			}
 			collided = true;
-			collideTime = std::chrono::system_clock::now();
+		} else {
+			collided = false;
 		}
 		if (collided &&
 				std::chrono::duration<double>(std::chrono::system_clock::now() - collideTime).count() >= Tetris::LOCK_DELAY) {

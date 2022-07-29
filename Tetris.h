@@ -42,8 +42,9 @@ class Tetris {
 	int xrightborder;
 	int level = 0;
 	int lines_cleared = 0;
-	double SOFT_MOVE_SPEED = .1;
-	double LOCK_DELAY = .5;
+	const double ROTATE_SPEED = .1;
+	const double SOFT_MOVE_SPEED = .1;
+	const double LOCK_DELAY = .5;
 	bool left = false;
 	bool right = false;
 	bool down = false;
