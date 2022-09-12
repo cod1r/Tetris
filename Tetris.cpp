@@ -14,74 +14,84 @@ Tetris::Tetris(int width, int height)
 		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_HEIGHT,
 				std::vector<int>(Tetris::TETRIS_PLAYFIELD_WIDTH, -1));
 	Tetris::Tetrominos[Tetris::I] = Tetris::Tetromino {
-		std::tuple<int, int, int, std::pair<int, int>>{
+		{
 			173,
 			216,
 			230,
-			std::pair<int, int> {3, 0}
+			{3, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 1},
-			std::pair<int, int>{5, 1},
-			std::pair<int, int>{6, 1},
+			{
+				{3, 1},
+				{4, 1},
+				{5, 1},
+				{6, 1},
+			}
 		}
 	};
 	Tetris::Tetrominos[Tetris::L] = Tetris::Tetromino {
-		std::tuple<int, int, int, std::pair<int, int>>{
+		{
 			0,
 			0,
 			139,
-			std::pair<int, int> {2, 0}
+			{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 1},
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 1},
-			std::pair<int, int>{4, 0},
+			{
+				{2, 1},
+				{3, 1},
+				{4, 1},
+				{4, 0},
+			}
 		}
 	};
 	Tetris::Tetrominos[Tetris::J] = Tetris::Tetromino {
-		std::tuple<int, int, int, std::pair<int, int>>{
+		{
 			240,
 			165,
 			0,
-			std::pair<int, int>{2, 0}
+			{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 0},
-			std::pair<int, int>{2, 1},
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 1},
+			{
+				{2, 0},
+				{2, 1},
+				{3, 1},
+				{4, 1},
+			}
 		}
 	};
 	// O doesn't need to be rotated
 	Tetris::Tetrominos[Tetris::O] = Tetris::Tetromino {
-		std::tuple<int, int, int, std::pair<int, int>>{
+		{
 			255,
 			255,
 			0,
-			std::pair<int, int>{3, -1}
+			{3, -1}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{4, 0},
-			std::pair<int, int>{5, 0},
-			std::pair<int, int>{4, 1},
-			std::pair<int, int>{5, 1},
+			{
+				{4, 0},
+				{5, 0},
+				{4, 1},
+				{5, 1},
+			}
 		}
 	};
 	Tetris::Tetrominos[Tetris::T] = Tetris::Tetromino {
-		std::tuple<int, int, int, std::pair<int, int>>{
+		{
 			128,
 			0,
 			128,
-			std::pair<int, int>{2, 0}
+			{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 1},
-			std::pair<int, int>{3, 0},
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 1},
+			{
+				{2, 1},
+				{3, 0},
+				{3, 1},
+				{4, 1},
+			}
 		}
 	};
 	Tetris::Tetrominos[Tetris::S] = Tetris::Tetromino {
@@ -89,13 +99,15 @@ Tetris::Tetris(int width, int height)
 			0,
 			255,
 			0,
-			std::pair<int, int>{2, 0}
+			{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 1},
-			std::pair<int, int>{3, 0},
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 0},
+			{
+				{2, 1},
+				{3, 0},
+				{3, 1},
+				{4, 0},
+			}
 		}
 	};
 	Tetris::Tetrominos[Tetris::Z] = Tetris::Tetromino {
@@ -103,13 +115,15 @@ Tetris::Tetris(int width, int height)
 			255,
 			0,
 			0,
-			std::pair<int, int>{2, 0}
+			{2, 0}
 		},
 		std::array<std::pair<int, int>, 4>{
-			std::pair<int, int>{2, 0},
-			std::pair<int, int>{3, 0},
-			std::pair<int, int>{3, 1},
-			std::pair<int, int>{4, 1},
+			{
+				{2, 0},
+				{3, 0},
+				{3, 1},
+				{4, 1},
+			}
 		}
 	};
 	Tetris::LevelSpeed = std::array<double, 15>{
