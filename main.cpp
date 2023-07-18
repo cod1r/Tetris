@@ -1,9 +1,10 @@
+#include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <string>
 #include <iostream>
 #include "Tetris.h"
-#define WIDTH 250
-#define HEIGHT 500
+#define WIDTH 300
+#define HEIGHT 600
 
 int main(int argc, char *argv[])
 {

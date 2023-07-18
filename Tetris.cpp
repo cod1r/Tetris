@@ -1,4 +1,8 @@
+#include <GL/glew.h>
+#include <string>
+#include <cstdint>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <SDL2/SDL.h>
 #include <stdexcept>
@@ -10,6 +14,7 @@
 
 Tetris::Tetris(int width, int height)
 {
+	Tetris::blocksize = height / Tetris::TETRIS_PLAYFIELD_HEIGHT;
 	Tetris::playfield = \
 		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_HEIGHT,
 				std::vector<int>(Tetris::TETRIS_PLAYFIELD_WIDTH, -1));
@@ -153,9 +158,111 @@ Tetris::Tetris(int width, int height)
 		0,
 		width,
 		height,
-		0
+		SDL_WINDOW_OPENGL
 	);
-	Tetris::renderer = SDL_CreateRenderer(window, -1, 0);
+	SDL_GLContext ctx = SDL_GL_CreateContext(Tetris::window);
+	if (ctx == NULL) {
+		std::cerr << SDL_GetError() << std::endl;
+		throw;
+	}
+	int res = SDL_GL_MakeCurrent(Tetris::window, ctx);
+	if (res < 0) {
+		std::cerr << SDL_GetError() << std::endl;
+		throw;
+	}
+	GLenum glew_init_res = glewInit();
+	if (glew_init_res != GLEW_OK) {
+		std::cerr << "Unable to initialize GLEW" << std::endl;
+		std::cerr << glewGetErrorString(glew_init_res) << std::endl;
+		throw;
+	}
+	Tetris::shader_program = glCreateProgram();
+	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+	std::ifstream vertex;
+	vertex.open("shaders/vertex_shader.glsl");
+	if (vertex.is_open()) {
+		std::string v_src;
+		while (!vertex.eof()) {
+			v_src += vertex.get();
+		}
+		vertex.close();
+		int length = v_src.length();
+		const GLchar* src = v_src.c_str();
+		glShaderSource(vs, 1, &src, &length);
+		glCompileShader(vs);
+		int status;
+		glGetShaderiv(vs, GL_COMPILE_STATUS, &status);
+		if (!status) {
+			std::cerr << "COMPILATION FAILED" << std::endl;
+			int info_log_length;
+			glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &info_log_length);
+			std::string info_log(info_log_length, ' ');
+			glGetShaderInfoLog(vs, info_log.length(), &info_log_length, info_log.data());
+			std::cerr << info_log << std::endl;
+			throw;
+		}
+		glAttachShader(Tetris::shader_program, vs);
+		glLinkProgram(Tetris::shader_program);
+
+		GLuint VBO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		float vertices[] = {
+			-0.05f, -0.05f,
+			0.05f, -0.05f,
+			0.0f,  0.05f
+		};
+		glBufferData(
+				GL_ARRAY_BUFFER,
+				sizeof(vertices),
+				vertices,
+				GL_DYNAMIC_DRAW
+				);
+		GLint location = glGetAttribLocation(Tetris::shader_program, "pos");
+		if (location == -1) {
+			std::cerr << "FUCK" << std::endl;
+			throw;
+		}
+		glVertexAttribPointer(location, 2, GL_FLOAT, false, 2 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(location);
+
+	} else {
+		std::cerr << "Shader failed to open" << std::endl;
+		throw;
+	}
+	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+	std::ifstream fragment;
+	fragment.open("shaders/fragment_shader.glsl");
+	if (fragment.is_open()) {
+		std::string f_src;
+		while (!fragment.eof()) {
+			f_src += fragment.get();
+		}
+		fragment.close();
+		int length = f_src.length();
+		const GLchar* src = f_src.c_str();
+		glShaderSource(fs, 1, &src, &length);
+		glCompileShader(fs);
+		int status;
+		glGetShaderiv(fs, GL_COMPILE_STATUS, &status);
+		if (!status) {
+			std::cerr << "COMPILATION FAILED" << std::endl;
+			int info_log_length;
+			glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &info_log_length);
+			std::string info_log(info_log_length, ' ');
+			glGetShaderInfoLog(fs, info_log.length(), &info_log_length, info_log.data());
+			std::cerr << info_log << std::endl;
+			throw;
+		}
+		glAttachShader(Tetris::shader_program, fs);
+		glLinkProgram(Tetris::shader_program);
+	} else {
+		std::cerr << "Fragment Shader failed to open" << std::endl;
+		throw;
+	}
+
+
+	//Tetris::renderer = SDL_CreateRenderer(window, -1, 0);
 	Tetris::generateSequence();
 	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::sequence.at(Tetris::sequence_index)];
 	Tetris::xleftborder = \
@@ -498,54 +605,65 @@ void Tetris::loop()
 
 void Tetris::draw()
 {
-	SDL_SetRenderDrawColor(Tetris::renderer, 0, 0, 0, 255);
-	SDL_RenderClear(Tetris::renderer);
-	SDL_SetRenderDrawColor(Tetris::renderer, 100, 100, 100, 255);
-	SDL_Rect playfield_area {
-		Tetris::xleftborder,
-		0,
-		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH,
-		Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_HEIGHT
-	};
-	SDL_RenderFillRect(Tetris::renderer, &playfield_area);
-	SDL_SetRenderDrawColor(Tetris::renderer, 255, 255, 255, 255);
-	for (int Y = 0; Y < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++Y) {
-		for (int X = 0; X < Tetris::TETRIS_PLAYFIELD_WIDTH; ++X) {
-			if (Tetris::playfield[Y][X] != -1) {
-				SDL_SetRenderDrawColor(
-					Tetris::renderer,
-					std::get<0>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
-					std::get<1>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
-					std::get<2>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
-					255
-				);
-				SDL_Rect temp {
-					Tetris::xleftborder + Tetris::blocksize * X,
-					Tetris::blocksize * Y,
-					Tetris::blocksize,
-					Tetris::blocksize
-				};
-				SDL_RenderFillRect(Tetris::renderer, &temp);
-			}
-		}
+	GLint out_color_location = glGetUniformLocation(this->shader_program, "out_color");
+	if (out_color_location == -1) {
+		std::cerr << "FUCK" << std::endl;
+		throw;
 	}
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		SDL_SetRenderDrawColor(
-			Tetris::renderer,
-			std::get<0>(Tetris::currentTetromino.first),
-			std::get<1>(Tetris::currentTetromino.first),
-			std::get<2>(Tetris::currentTetromino.first),
-			255
-		);
-		SDL_Rect temp {
-			Tetris::xleftborder + Tetris::blocksize * Tetris::currentTetromino.second.at(i).first,
-			Tetris::blocksize * Tetris::currentTetromino.second.at(i).second,
-			Tetris::blocksize,
-			Tetris::blocksize
-		};
-		SDL_RenderFillRect(Tetris::renderer, &temp);
-	}
-	SDL_RenderPresent(Tetris::renderer);
+	glUniform4f(out_color_location, 0.0f, 1.0f, 0.5f, 1.0f);
+	glUseProgram(this->shader_program);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	SDL_GL_SwapWindow(this->window);
+
+	// -- old
+	//SDL_SetRenderDrawColor(Tetris::renderer, 0, 0, 0, 255);
+	//SDL_RenderClear(Tetris::renderer);
+	//SDL_SetRenderDrawColor(Tetris::renderer, 100, 100, 100, 255);
+	//SDL_Rect playfield_area {
+	//	Tetris::xleftborder,
+	//	0,
+	//	Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH,
+	//	Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_HEIGHT
+	//};
+	//SDL_RenderFillRect(Tetris::renderer, &playfield_area);
+	//SDL_SetRenderDrawColor(Tetris::renderer, 255, 255, 255, 255);
+	//for (int Y = 0; Y < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++Y) {
+	//	for (int X = 0; X < Tetris::TETRIS_PLAYFIELD_WIDTH; ++X) {
+	//		if (Tetris::playfield[Y][X] != -1) {
+	//			SDL_SetRenderDrawColor(
+	//				Tetris::renderer,
+	//				std::get<0>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
+	//				std::get<1>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
+	//				std::get<2>(Tetris::Tetrominos.at(Tetris::playfield[Y][X]).first),
+	//				255
+	//			);
+	//			SDL_Rect temp {
+	//				Tetris::xleftborder + Tetris::blocksize * X,
+	//				Tetris::blocksize * Y,
+	//				Tetris::blocksize,
+	//				Tetris::blocksize
+	//			};
+	//			SDL_RenderFillRect(Tetris::renderer, &temp);
+	//		}
+	//	}
+	//}
+	//for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
+	//	SDL_SetRenderDrawColor(
+	//		Tetris::renderer,
+	//		std::get<0>(Tetris::currentTetromino.first),
+	//		std::get<1>(Tetris::currentTetromino.first),
+	//		std::get<2>(Tetris::currentTetromino.first),
+	//		255
+	//	);
+	//	SDL_Rect temp {
+	//		Tetris::xleftborder + Tetris::blocksize * Tetris::currentTetromino.second.at(i).first,
+	//		Tetris::blocksize * Tetris::currentTetromino.second.at(i).second,
+	//		Tetris::blocksize,
+	//		Tetris::blocksize
+	//	};
+	//	SDL_RenderFillRect(Tetris::renderer, &temp);
+	//}
+	//SDL_RenderPresent(Tetris::renderer);
 }
 
 Tetris::~Tetris()
