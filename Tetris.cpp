@@ -12,12 +12,8 @@
 #include <set>
 #include "Tetris.h"
 
-Tetris::Tetris(int width, int height)
+Tetris::Tetris()
 {
-	Tetris::blocksize = height / Tetris::TETRIS_PLAYFIELD_HEIGHT;
-	Tetris::playfield = \
-		std::vector<std::vector<int>>(Tetris::TETRIS_PLAYFIELD_HEIGHT,
-				std::vector<int>(Tetris::TETRIS_PLAYFIELD_WIDTH, -1));
 	Tetris::Tetrominos[Tetris::I] = Tetris::Tetromino {
 		{
 			173,
@@ -156,8 +152,8 @@ Tetris::Tetris(int width, int height)
 		"Tetris",
 		0,
 		0,
-		width,
-		height,
+		Tetris::WIDTH,
+		Tetris::HEIGHT,
 		SDL_WINDOW_OPENGL
 	);
 	SDL_GLContext ctx = SDL_GL_CreateContext(Tetris::window);
@@ -266,7 +262,7 @@ Tetris::Tetris(int width, int height)
 	Tetris::generateSequence();
 	Tetris::currentTetromino = Tetris::Tetrominos[Tetris::sequence.at(Tetris::sequence_index)];
 	Tetris::xleftborder = \
-		(width - Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH) / 2;
+		(WIDTH - Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH) / 2;
 	Tetris::xrightborder = \
 		Tetris::xleftborder + \
 		(Tetris::blocksize * Tetris::TETRIS_PLAYFIELD_WIDTH);

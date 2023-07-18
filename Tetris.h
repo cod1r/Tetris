@@ -24,7 +24,33 @@ class Tetris {
 		T,
 		Z
 	};
-	std::vector<std::vector<int32_t>> playfield;
+	static const int32_t TETRIS_PLAYFIELD_WIDTH = 10;
+	static const int32_t TETRIS_PLAYFIELD_HEIGHT = 20;
+	static const int32_t HEIGHT = 600;
+	const int32_t WIDTH = 300;
+	constexpr static int32_t blocksize = HEIGHT / TETRIS_PLAYFIELD_HEIGHT;
+	int32_t playfield[TETRIS_PLAYFIELD_HEIGHT][TETRIS_PLAYFIELD_WIDTH] = {
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+		{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
+	};
 	SDL_Window *window = nullptr;
 	SDL_Renderer *renderer = nullptr;
 	// I J L O S T Z
@@ -33,9 +59,6 @@ class Tetris {
 	std::array<int32_t, 7> sequence;
 	Tetromino currentTetromino;
 	const int32_t LINE_CLEAR_LEVELUP_AMOUNT = 10;
-	const int32_t TETRIS_PLAYFIELD_WIDTH = 10;
-	const int32_t TETRIS_PLAYFIELD_HEIGHT = 20;
-	int32_t blocksize;
 	const int32_t TETROMINO_SIZE = 4;
 	const int32_t MAX_LEVELS = 15;
 	int32_t sequence_index = 0;
@@ -65,7 +88,7 @@ class Tetris {
 	GLuint shader_program;
 	public:
 		void loop();
-		Tetris(int32_t, int32_t);
+		Tetris();
 		~Tetris();
 };
 #endif
