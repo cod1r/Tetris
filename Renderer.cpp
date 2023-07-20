@@ -1,22 +1,27 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#include <iostream>
+#include <fstream>
 #include "Tetromino.h"
+#include "Tetris.h"
 #include "Renderer.h"
 Renderer::Renderer()
 {
+	Renderer::BLOCKSIZE = Renderer::PLAYFIELD_HEIGHT / Tetris::TETRIS_PLAYFIELD_HEIGHT;
 	int result = SDL_Init(SDL_INIT_VIDEO);
 	if (result < 0) {
-		throw std::runtime_error(SDL_GetError());
+		std::cerr << SDL_GetError() << std::endl;
+		throw;
 	}
 	Renderer::WINDOW = SDL_CreateWindow(
 		"Tetris",
 		0,
 		0,
-		Tetris::WIDTH,
-		Tetris::HEIGHT,
+		Renderer::WINDOW_WIDTH,
+		Renderer::WINDOW_HEIGHT,
 		SDL_WINDOW_OPENGL
 	);
-	SDL_GLContext ctx = SDL_GL_CreateContext(Renderer::window);
+	SDL_GLContext ctx = SDL_GL_CreateContext(Renderer::WINDOW);
 	if (ctx == NULL) {
 		std::cerr << SDL_GetError() << std::endl;
 		throw;
@@ -93,7 +98,7 @@ void Renderer::render_tetromino(Tetromino t)
 {
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	int vertices[] = {
 		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
 		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
@@ -117,14 +122,15 @@ void Renderer::render_tetromino(Tetromino t)
 	};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 	GLuint location = glGetAttribLocation(Renderer::current_program, "pos");
-	glVertexAttribPointer(location, 2, GL_INT, 2 * sizeof(int32_t), (void*)0);
-	glEnableVertexAttrib(location);
+	glVertexAttribPointer(location, 2, GL_INT, false, 2 * sizeof(int32_t), (void*)0);
+	glEnableVertexAttribArray(location);
 
 	if (glIsBuffer(Renderer::current_vbo)) {
 		Renderer::vertex_buffer_objects.push_back(Renderer::current_vbo);
 		Renderer::create_program();
 		GLint out_color_location = glGetAttribLocation(Renderer::current_program, "out_color");
-		glUniform4iv(out_color_location, 4, (int[]){t.red, t.green, t.blue, 1});
+		int temp[] = {t.red, t.green, t.blue, 1};
+		glUniform4iv(out_color_location, 4, temp);
 	}
 	Renderer::current_vbo = vbo;
 }
@@ -138,7 +144,7 @@ void Renderer::create_program()
 }
 void Renderer::update_tetromino(Tetromino t)
 {
-	glBindBuffer(Renderer::current_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
 	int vertices[] = {
 		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
 		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
@@ -167,7 +173,7 @@ void Renderer::render()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(Renderer::current_program);
-	glBindBuffer(Renderer::current_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
 	glDrawArrays(GL_TRIANGLES, 0, 16);
 	for (int idx = 0; idx < Renderer::vertex_buffer_objects.size(); ++idx) {
 		glUseProgram(Renderer::programs.at(idx));

@@ -24,6 +24,8 @@ struct Tetromino {
 	int8_t red;
 	int8_t blue;
 	int8_t green;
+	Tetromino();
+	Tetromino(const Tetromino&);
 	Tetromino(
 			TetrominoType,
 			int32_t,

@@ -12,17 +12,21 @@
 #include <set>
 #include "Tetris.h"
 #include "Tetromino.h"
+#include "Renderer.h"
 
 Tetris::Tetris()
 {
-	Tetris::Tetrominos[0] = Tetris::Tetromino(TetrominoType::I, 3, 1, 4, 1, 5, 1, 6, 1, 173, 216, 230);
-	Tetris::Tetrominos[1] = Tetris::Tetromino(TetrominoType::L, 2, 1, 3, 1, 4, 1, 4, 0, 0, 0, 139);
-	Tetris::Tetrominos[2] = Tetris::Tetromino(TetrominoType::J, 2, 0, 2, 1, 3, 1, 4, 1, 240, 165, 0);
-	Tetris::Tetrominos[3] = Tetris::Tetromino(TetrominoType::O, 4, 0, 5, 0, 4, 1, 5, 1, 255, 255, 0);
-	Tetris::Tetrominos[4] = Tetris::Tetromino(TetrominoType::T, 2, 1, 3, 0, 3, 1, 4, 1, 128, 0, 128);
-	Tetris::Tetrominos[5] = Tetris::Tetromino(TetrominoType::S, 2, 1, 3, 0, 3, 1, 4, 0, 0, 255, 0);
-	Tetris::Tetrominos[6] = Tetris::Tetromino(TetrominoType::Z, 2, 0, 3, 0, 3, 1, 4, 1, 255, 0, 0);
-	Tetris::LevelSpeed = std::array<double, 15>{
+	renderer = new Renderer();
+	Tetris::Tetrominos = {{
+			new Tetromino(TetrominoType::I, 3, 1, 4, 1, 5, 1, 6, 1, 173, 216, 230),
+			new Tetromino(TetrominoType::L, 2, 1, 3, 1, 4, 1, 4, 0, 0, 0, 139),
+			new Tetromino(TetrominoType::J, 2, 0, 2, 1, 3, 1, 4, 1, 240, 165, 0),
+			new Tetromino(TetrominoType::O, 4, 0, 5, 0, 4, 1, 5, 1, 255, 255, 0),
+			new Tetromino(TetrominoType::T, 2, 1, 3, 0, 3, 1, 4, 1, 128, 0, 128),
+			new Tetromino(TetrominoType::S, 2, 1, 3, 0, 3, 1, 4, 0, 0, 255, 0),
+			new Tetromino(TetrominoType::Z, 2, 0, 3, 0, 3, 1, 4, 1, 255, 0, 0),
+	}};
+	Tetris::LevelSpeed = {{
 		1.0,
 		0.79300,
 		0.6178,
@@ -38,157 +42,130 @@ Tetris::Tetris()
 		0.01815,
 		0.01144,
 		0.00706
-	};
+	}};
 	Tetris::generate_sequence();
-	Tetris::current_tetromino = Tetris::Tetrominos[Tetris::sequence.at(Tetris::sequence_index)];
+	Tetris::current_tetromino = new Tetromino(*Tetris::Tetrominos[Tetris::sequence.at(Tetris::sequence_index)]);
+	renderer->render_tetromino(*Tetris::current_tetromino);
 }
 
-bool Tetris::checkFill()
+bool Tetris::check_fill()
 {
-	for (std::pair<int, int> p : Tetris::current_tetromino.second) {
-		if (Tetris::playfield[p.second][p.first] != -1) {
-			return false;
-		}
+	if (Tetris::playfield[current_tetromino->y1][current_tetromino->x1] != -1
+			|| Tetris::playfield[current_tetromino->y2][current_tetromino->x2] != -1
+			|| Tetris::playfield[current_tetromino->y3][current_tetromino->x3] != -1
+			|| Tetris::playfield[current_tetromino->y4][current_tetromino->x4] != -1) {
+		return false;
 	}
 	return true;
 }
 
 void Tetris::rotate()
 {
-	Tetris::Tetromino tempT = Tetris::current_tetromino;
-	if (Tetris::sequence.at(Tetris::sequence_index) == Tetris::I ||
-			Tetris::sequence.at(Tetris::sequence_index) == Tetris::O) {
-		const int rotateMatrixSize = 4;
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).first -= std::get<3>(tempT.first).first;
-			tempT.second.at(t).second -= std::get<3>(tempT.first).second;
-
-			int old_c = tempT.second.at(t).first;
-			tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-			tempT.second.at(t).second = old_c;
-
-			tempT.second.at(t).first += std::get<3>(tempT.first).first;
-			tempT.second.at(t).second += std::get<3>(tempT.first).second;
-		}
-	} else {
-		const int rotateMatrixSize = 3;
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).first -= std::get<3>(tempT.first).first;
-			tempT.second.at(t).second -= std::get<3>(tempT.first).second;
-
-			int old_c = tempT.second.at(t).first;
-			tempT.second.at(t).first = rotateMatrixSize - 1 - tempT.second.at(t).second;
-			tempT.second.at(t).second = old_c;
-
-			tempT.second.at(t).first += std::get<3>(tempT.first).first;
-			tempT.second.at(t).second += std::get<3>(tempT.first).second;
-		}
-	}
-	bool swappable = true;
-	int miny = INT_MAX;
-	int maxy = INT_MIN;
-	int minx = INT_MAX;
-	int maxx = INT_MIN;
-	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-		miny = SDL_min(miny, tempT.second.at(t).second);
-		maxy = SDL_max(maxy, tempT.second.at(t).second);
-		minx = SDL_min(minx, tempT.second.at(t).first);
-		maxx = SDL_max(maxx, tempT.second.at(t).first);
-	}
-	if (miny < 0) {
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).second += SDL_abs(miny);
-		}
-	} else if (maxy >= Tetris::TETRIS_PLAYFIELD_HEIGHT) {
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).second -= SDL_abs(maxy - (Tetris::TETRIS_PLAYFIELD_HEIGHT - 1));
-		}
-	}
-
-	if (minx < 0) {
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).first += SDL_abs(minx);
-		}
-	} else if (maxx >= Tetris::TETRIS_PLAYFIELD_WIDTH) {
-		for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-			tempT.second.at(t).first -= SDL_abs(maxx - (Tetris::TETRIS_PLAYFIELD_WIDTH - 1));
-		}
-	}
-	for (std::pair<int, int> p : tempT.second) {
-		if (p.first < 0 ||
-				p.first >= Tetris::TETRIS_PLAYFIELD_WIDTH ||
-				p.second < 0 ||
-				p.second >= Tetris::TETRIS_PLAYFIELD_HEIGHT ||
-				Tetris::playfield[p.second][p.first] != -1
-		) {
-			swappable = false;
-		}
-	}
-	if (swappable) {
-		Tetris::current_tetromino = tempT;
-	}
 }
 
 void Tetris::hard_drop()
 {
 	int min_add = INT_MAX;
-	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-		min_add = SDL_min(min_add, Tetris::TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::current_tetromino.second.at(t).second);
-		for (int Y = Tetris::TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::current_tetromino.second.at(t).second; --Y) {
-			if (Tetris::playfield[Y][Tetris::current_tetromino.second.at(t).first] != -1) {
-				min_add = SDL_min(min_add, Y - 1 - Tetris::current_tetromino.second.at(t).second);
-			}
+
+	min_add = SDL_min(min_add,
+			TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::current_tetromino->y1);
+	for (int Y = TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::current_tetromino->y1; --Y) {
+		if (Tetris::playfield[Y][Tetris::current_tetromino->x1] != -1) {
+			min_add = SDL_min(min_add, Y - 1 - Tetris::current_tetromino->y1);
 		}
 	}
-	std::get<3>(Tetris::current_tetromino.first).second += min_add;
-	for (int t = 0; t < Tetris::TETROMINO_SIZE; ++t) {
-		Tetris::current_tetromino.second.at(t).second += min_add;
+
+	min_add = SDL_min(min_add,
+			TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::current_tetromino->y2);
+	for (int Y = TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::current_tetromino->y2; --Y) {
+		if (Tetris::playfield[Y][Tetris::current_tetromino->x2] != -1) {
+			min_add = SDL_min(min_add, Y - 1 - Tetris::current_tetromino->y2);
+		}
 	}
+
+	min_add = SDL_min(min_add,
+			TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::current_tetromino->y3);
+	for (int Y = TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::current_tetromino->y3; --Y) {
+		if (Tetris::playfield[Y][Tetris::current_tetromino->x3] != -1) {
+			min_add = SDL_min(min_add, Y - 1 - Tetris::current_tetromino->y3);
+		}
+	}
+
+	min_add = SDL_min(min_add,
+			TETRIS_PLAYFIELD_HEIGHT - 1 - Tetris::current_tetromino->y4);
+	for (int Y = TETRIS_PLAYFIELD_HEIGHT - 1; Y > Tetris::current_tetromino->y4; --Y) {
+		if (Tetris::playfield[Y][Tetris::current_tetromino->x4] != -1) {
+			min_add = SDL_min(min_add, Y - 1 - Tetris::current_tetromino->y4);
+		}
+	}
+
+	Tetris::current_tetromino->y1 += min_add;
+	Tetris::current_tetromino->y2 += min_add;
+	Tetris::current_tetromino->y3 += min_add;
+	Tetris::current_tetromino->y4 += min_add;
 }
 
 void Tetris::lock()
 {
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		Tetris::playfield[Tetris::current_tetromino.second.at(i).second][Tetris::current_tetromino.second.at(i).first] = \
-			Tetris::sequence.at(Tetris::sequence_index);
-	}
+		Tetris::playfield[Tetris::current_tetromino->y1][Tetris::current_tetromino->x1] = Tetris::sequence.at(Tetris::sequence_index);
+		Tetris::playfield[Tetris::current_tetromino->y2][Tetris::current_tetromino->x2] = Tetris::sequence.at(Tetris::sequence_index);
+		Tetris::playfield[Tetris::current_tetromino->y3][Tetris::current_tetromino->x3] = Tetris::sequence.at(Tetris::sequence_index);
+		Tetris::playfield[Tetris::current_tetromino->y4][Tetris::current_tetromino->x4] = Tetris::sequence.at(Tetris::sequence_index);
+
 	++Tetris::sequence_index;
 	if (Tetris::sequence_index == 7) {
 		Tetris::generate_sequence();
 		Tetris::sequence_index = 0;
 	}
-	Tetris::current_tetromino = Tetris::Tetrominos.at(Tetris::sequence.at(Tetris::sequence_index));
+	Tetris::current_tetromino = new Tetromino(*Tetris::Tetrominos.at(Tetris::sequence.at(Tetris::sequence_index)));
+	renderer->render_tetromino(*Tetris::current_tetromino);
 }
 
 bool Tetris::check_collision()
 {
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		if (Tetris::current_tetromino.second.at(i).second + 1 == Tetris::TETRIS_PLAYFIELD_HEIGHT ||
-				(Tetris::current_tetromino.second.at(i).second + 1 < Tetris::TETRIS_PLAYFIELD_HEIGHT &&
-				Tetris::playfield[Tetris::current_tetromino.second.at(i).second + 1][Tetris::current_tetromino.second.at(i).first] != -1)
-		) {
-				return true;
-		}
+	if (Tetris::current_tetromino->y1 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y1 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y1 + 1][Tetris::current_tetromino->x1] != -1)
+		 ) {
+		return true;
+	}
+	if (Tetris::current_tetromino->y2 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y2 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y2 + 1][Tetris::current_tetromino->x2] != -1)
+		 ) {
+		return true;
+	}
+	if (Tetris::current_tetromino->y3 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y3 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y3 + 1][Tetris::current_tetromino->x3] != -1)
+		 ) {
+		return true;
+	}
+	if (Tetris::current_tetromino->y4 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y4 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y4 + 1][Tetris::current_tetromino->x4] != -1)
+		 ) {
+		return true;
 	}
 	return false;
 }
 
 void Tetris::check_line_clear()
 {
-	for (int Y = 0; Y < Tetris::TETRIS_PLAYFIELD_HEIGHT; ++Y) {
+	for (int Y = 0; Y < TETRIS_PLAYFIELD_HEIGHT; ++Y) {
 		int counter = 0;
-		for (int X = 0; X < Tetris::TETRIS_PLAYFIELD_WIDTH; ++X) {
+		for (int X = 0; X < TETRIS_PLAYFIELD_WIDTH; ++X) {
 			if (Tetris::playfield[Y][X] != -1) {
 				++counter;
 			}
 		}
-		if (counter == Tetris::TETRIS_PLAYFIELD_WIDTH) {
+		if (counter == TETRIS_PLAYFIELD_WIDTH) {
 			++Tetris::lines_cleared;
-			for (int X2 = 0; X2 < Tetris::TETRIS_PLAYFIELD_WIDTH; ++X2) {
+			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				Tetris::playfield[Y][X2] = -1;
 			}
 			for (int Y2 = Y; Y2 > 0; --Y2) {
-				for (int X2 = 0; X2 < Tetris::TETRIS_PLAYFIELD_WIDTH; ++X2) {
+				for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 					std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 				}
 			}
@@ -218,34 +195,67 @@ void Tetris::generate_sequence()
 
 bool Tetris::check_left()
 {
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		if (Tetris::current_tetromino.second.at(i).first - 1 < 0 ||
-				(Tetris::current_tetromino.second.at(i).first - 1 >= 0 &&
-				 Tetris::playfield[Tetris::current_tetromino.second.at(i).second][Tetris::current_tetromino.second.at(i).first - 1] != -1))
-			return false;
-	}
+	if (Tetris::current_tetromino->x1 - 1 < 0 ||
+			(Tetris::current_tetromino->x1 - 1 >= 0 &&
+			 Tetris::playfield[Tetris::current_tetromino->y1][Tetris::current_tetromino->x1 - 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x2 - 1 < 0 ||
+			(Tetris::current_tetromino->x2 - 1 >= 0 &&
+			 Tetris::playfield[Tetris::current_tetromino->y2][Tetris::current_tetromino->x2 - 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x3 - 1 < 0 ||
+			(Tetris::current_tetromino->x3 - 1 >= 0 &&
+			 Tetris::playfield[Tetris::current_tetromino->y3][Tetris::current_tetromino->x3 - 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x4 - 1 < 0 ||
+			(Tetris::current_tetromino->x4 - 1 >= 0 &&
+			 Tetris::playfield[Tetris::current_tetromino->y4][Tetris::current_tetromino->x4 - 1] != -1))
+		return false;
 	return true;
 }
 
 bool Tetris::check_right()
 {
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		if (Tetris::current_tetromino.second.at(i).first + 1 == Tetris::TETRIS_PLAYFIELD_WIDTH ||
-				(Tetris::current_tetromino.second.at(i).first + 1 < Tetris::TETRIS_PLAYFIELD_WIDTH &&
-				 Tetris::playfield[Tetris::current_tetromino.second.at(i).second][Tetris::current_tetromino.second.at(i).first + 1] != -1))
-			return false;
-	}
+	if (Tetris::current_tetromino->x1 + 1 == TETRIS_PLAYFIELD_WIDTH ||
+			(Tetris::current_tetromino->x1 + 1 < TETRIS_PLAYFIELD_WIDTH &&
+			 Tetris::playfield[Tetris::current_tetromino->y1][Tetris::current_tetromino->x1 + 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x2 + 1 == TETRIS_PLAYFIELD_WIDTH ||
+			(Tetris::current_tetromino->x2 + 1 < TETRIS_PLAYFIELD_WIDTH &&
+			 Tetris::playfield[Tetris::current_tetromino->y2][Tetris::current_tetromino->x2 + 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x3 + 1 == TETRIS_PLAYFIELD_WIDTH ||
+			(Tetris::current_tetromino->x3 + 1 < TETRIS_PLAYFIELD_WIDTH &&
+			 Tetris::playfield[Tetris::current_tetromino->y3][Tetris::current_tetromino->x3 + 1] != -1))
+		return false;
+	if (Tetris::current_tetromino->x4 + 1 == TETRIS_PLAYFIELD_WIDTH ||
+			(Tetris::current_tetromino->x4 + 1 < TETRIS_PLAYFIELD_WIDTH &&
+			 Tetris::playfield[Tetris::current_tetromino->y4][Tetris::current_tetromino->x4 + 1] != -1))
+		return false;
 	return true;
 }
 
 bool Tetris::check_down()
 {
-	for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-		if (Tetris::current_tetromino.second.at(i).second + 1 == Tetris::TETRIS_PLAYFIELD_HEIGHT ||
-				(Tetris::current_tetromino.second.at(i).second + 1 < Tetris::TETRIS_PLAYFIELD_HEIGHT &&
-				 Tetris::playfield[Tetris::current_tetromino.second.at(i).second + 1][Tetris::current_tetromino.second.at(i).first] != -1)) {
-			return false;
-		}
+	if (Tetris::current_tetromino->y1 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y1 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y1 + 1][Tetris::current_tetromino->x1] != -1)) {
+		return false;
+	}
+	if (Tetris::current_tetromino->y2 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y2 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y2 + 1][Tetris::current_tetromino->x2] != -1)) {
+		return false;
+	}
+	if (Tetris::current_tetromino->y3 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y3 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y3 + 1][Tetris::current_tetromino->x3] != -1)) {
+		return false;
+	}
+	if (Tetris::current_tetromino->y4 + 1 == TETRIS_PLAYFIELD_HEIGHT ||
+			(Tetris::current_tetromino->y4 + 1 < TETRIS_PLAYFIELD_HEIGHT &&
+			 Tetris::playfield[Tetris::current_tetromino->y4 + 1][Tetris::current_tetromino->x4] != -1)) {
+		return false;
 	}
 	return true;
 }
@@ -296,7 +306,7 @@ void Tetris::loop()
 			}
 		}
 		if (Tetris::up &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+				std::chrono::duration<double>(std::chrono::system_clock::now() -
 					last_input_time_up).count() >= Tetris::ROTATE_SPEED
 		) {
 			last_input_time_up = std::chrono::system_clock::now();
@@ -304,15 +314,15 @@ void Tetris::loop()
 		}
 		if (
 				Tetris::left &&
-				std::chrono::duration<double>(std::chrono::system_clock::now() - \
+				std::chrono::duration<double>(std::chrono::system_clock::now() -
 					last_input_time_left).count() >= Tetris::SOFT_MOVE_SPEED &&
 				Tetris::check_left()
 		) {
 			last_input_time_left = std::chrono::system_clock::now();
-			--std::get<3>(Tetris::current_tetromino.first).first;
-			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				--Tetris::current_tetromino.second.at(i).first;
-			}
+			--Tetris::current_tetromino->x1;
+			--Tetris::current_tetromino->x2;
+			--Tetris::current_tetromino->x3;
+			--Tetris::current_tetromino->x4;
 		}
 		if (
 				Tetris::right &&
@@ -321,10 +331,11 @@ void Tetris::loop()
 				Tetris::check_right()
 		) {
 			last_input_time_right = std::chrono::system_clock::now();
-			++std::get<3>(Tetris::current_tetromino.first).first;
-			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				++Tetris::current_tetromino.second.at(i).first;
-			}
+			//++std::get<3>(Tetris::current_tetromino->first).first;
+			++Tetris::current_tetromino->x1;
+			++Tetris::current_tetromino->x2;
+			++Tetris::current_tetromino->x3;
+			++Tetris::current_tetromino->x4;
 		}
 		if (
 				Tetris::down &&
@@ -333,10 +344,10 @@ void Tetris::loop()
 				Tetris::check_down()
 		) {
 			last_input_time_down = std::chrono::system_clock::now();
-			++std::get<3>(Tetris::current_tetromino.first).second;
-			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				++Tetris::current_tetromino.second.at(i).second;
-			}
+			++Tetris::current_tetromino->y1;
+			++Tetris::current_tetromino->y2;
+			++Tetris::current_tetromino->y3;
+			++Tetris::current_tetromino->y4;
 		}
 
 		if (Tetris::space) {
@@ -344,15 +355,15 @@ void Tetris::loop()
 		}
 
 		std::chrono::time_point<std::chrono::system_clock> curr = std::chrono::system_clock::now();
-		bool right_time = \
+		bool right_time =
 			std::chrono::duration<double>(curr - prev).count() >= Tetris::LevelSpeed.at(Tetris::level);
 
 		if (right_time && !Tetris::down && Tetris::check_down()) {
 			prev = std::chrono::system_clock::now();
-			++std::get<3>(Tetris::current_tetromino.first).second;
-			for (int i = 0; i < Tetris::TETROMINO_SIZE; ++i) {
-				++Tetris::current_tetromino.second.at(i).second;
-			}
+			++Tetris::current_tetromino->y1;
+			++Tetris::current_tetromino->y2;
+			++Tetris::current_tetromino->y3;
+			++Tetris::current_tetromino->y4;
 		}
 
 		if (Tetris::check_collision()) {
@@ -370,6 +381,7 @@ void Tetris::loop()
 			collided = false;
 		}
 		Tetris::check_line_clear();
-		Tetris::draw();
+		renderer->update_tetromino(*Tetris::current_tetromino);
+		renderer->render();
 	}
 }

@@ -3,13 +3,13 @@
 #include <vector>
 #ifndef _RENDERER_H
 #define _RENDERER_H
-#include "Tetris.h"
-#include "Tetromino.h"
 struct Renderer {
 	SDL_Window* WINDOW = nullptr;
-	static const int32_t HEIGHT = 600;
-	const int32_t WIDTH = 300;
-	const static int32_t BLOCKSIZE = HEIGHT / TETRIS_PLAYFIELD_HEIGHT;
+	const int32_t WINDOW_WIDTH = 300;
+	const int32_t WINDOW_HEIGHT = 600;
+	const int32_t PLAYFIELD_WIDTH = 300;
+	const int32_t PLAYFIELD_HEIGHT = 600;
+	int32_t BLOCKSIZE;
 	GLuint vertex_shader;
 	GLuint fragment_shader;
 	GLuint current_vbo;
@@ -17,7 +17,7 @@ struct Renderer {
 	std::vector<GLuint> programs;
 	std::vector<GLuint> vertex_buffer_objects;
 	void render_tetromino(Tetromino);
-	void update_tetromino();
+	void update_tetromino(Tetromino);
 	void render();
 	void create_program();
 	Renderer();
