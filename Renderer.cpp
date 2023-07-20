@@ -101,39 +101,34 @@ void Renderer::render_tetromino(Tetromino t)
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	int32_t vertices[] = {
-		-1, 0,
-		0, 1,
-		1, 0
+	float vertices[] = {
+		t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
 	};
-	//int32_t vertices[] = {
-	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
-	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
-	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
-	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
-	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
-	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
-	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
-	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
-	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 	GLuint location = glGetAttribLocation(Renderer::current_program, "pos");
 	if (location == -1) {
-		std::cerr << "\"pos\"'s location could not be found" << std::endl;
+		std::cerr << "pos's location could not be found" << std::endl;
 		throw;
 	}
-	glVertexAttribPointer(location, 2, GL_INT, false, 2 * sizeof(int32_t), (void*)0);
+	glVertexAttribPointer(location, 2, GL_FLOAT, false, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(location);
 
 	if (glIsBuffer(Renderer::current_vbo)) {
@@ -145,9 +140,8 @@ void Renderer::render_tetromino(Tetromino t)
 		std::cerr << "out_color's location could not be found" << std::endl;
 		throw;
 	}
-	float temp[] = {t.red/255.0f, t.green/255.0f, t.blue/255.0f, 1.0f};
 	glUseProgram(Renderer::current_program);
-	glUniform4f(out_color_location, temp[0], temp[1], temp[2], temp[3]);
+	glUniform4f(out_color_location, t.red/255.0f, t.green/255.0f, t.blue/255.0f, 1.0f);
 	Renderer::current_vbo = vbo;
 }
 void Renderer::create_program()
@@ -162,44 +156,40 @@ void Renderer::create_program()
 void Renderer::update_tetromino(Tetromino t)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-	int32_t vertices[] = {
-		-1, 0,
-		0, 1,
-		1, 0
+	float vertices[] = {
+		t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+
+		t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
+		(t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1, (t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1,
 	};
-	//int32_t vertices[] = {
-	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
-	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
-	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
-	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
-	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
-	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
-	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
-	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
-	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-	//};
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 }
 void Renderer::render()
 {
+	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(Renderer::current_program);
 	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	//for (int idx = 0; idx < Renderer::vertex_buffer_objects.size(); ++idx) {
-	//	glUseProgram(Renderer::programs.at(idx));
-	//	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-	//	glDrawArrays(GL_TRIANGLES, 0, 3);
-	//}
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
+	for (int idx = 0; idx < Renderer::vertex_buffer_objects.size(); ++idx) {
+		glUseProgram(Renderer::programs.at(idx));
+		glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
+	}
 	SDL_GL_SwapWindow(Renderer::WINDOW);
 }
 Renderer::~Renderer()
