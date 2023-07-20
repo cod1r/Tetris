@@ -20,6 +20,7 @@ struct Renderer {
 	void update_tetromino(Tetromino);
 	void render();
 	void create_program();
+	std::vector<float> convert_coords_to_vertices(Tetromino);
 	Renderer();
 	~Renderer();
 };
