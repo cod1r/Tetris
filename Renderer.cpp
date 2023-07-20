@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <fstream>
+#include <format>
 #include "Tetromino.h"
 #include "Tetris.h"
 #include "Renderer.h"
@@ -93,93 +94,112 @@ Renderer::Renderer()
 		std::cerr << "Fragment Shader failed to open" << std::endl;
 		throw;
 	}
+	Renderer::create_program();
 }
 void Renderer::render_tetromino(Tetromino t)
 {
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	int vertices[] = {
-		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
-		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
-		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
-		t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
-		t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
-		t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
-		t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
-		t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
-		t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	int32_t vertices[] = {
+		-1, 0,
+		0, 1,
+		1, 0
 	};
+	//int32_t vertices[] = {
+	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
+	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
+	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
+	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
+	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
+	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
+	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
+	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
+	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//};
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 	GLuint location = glGetAttribLocation(Renderer::current_program, "pos");
+	if (location == -1) {
+		std::cerr << "\"pos\"'s location could not be found" << std::endl;
+		throw;
+	}
 	glVertexAttribPointer(location, 2, GL_INT, false, 2 * sizeof(int32_t), (void*)0);
 	glEnableVertexAttribArray(location);
 
 	if (glIsBuffer(Renderer::current_vbo)) {
 		Renderer::vertex_buffer_objects.push_back(Renderer::current_vbo);
 		Renderer::create_program();
-		GLint out_color_location = glGetAttribLocation(Renderer::current_program, "out_color");
-		int temp[] = {t.red, t.green, t.blue, 1};
-		glUniform4iv(out_color_location, 4, temp);
 	}
+	GLint out_color_location = glGetUniformLocation(Renderer::current_program, "out_color");
+	if (out_color_location == -1) {
+		std::cerr << "out_color's location could not be found" << std::endl;
+		throw;
+	}
+	float temp[] = {t.red/255.0f, t.green/255.0f, t.blue/255.0f, 1.0f};
+	glUseProgram(Renderer::current_program);
+	glUniform4f(out_color_location, temp[0], temp[1], temp[2], temp[3]);
 	Renderer::current_vbo = vbo;
 }
 void Renderer::create_program()
 {
-	Renderer::programs.push_back(Renderer::current_program);
-	GLuint program = glCreateProgram();
+	if (glIsProgram(Renderer::current_program))
+		Renderer::programs.push_back(Renderer::current_program);
+	Renderer::current_program = glCreateProgram();
 	glAttachShader(Renderer::current_program, Renderer::vertex_shader);
 	glAttachShader(Renderer::current_program, Renderer::fragment_shader);
-	glLinkProgram(program);
+	glLinkProgram(Renderer::current_program);
 }
 void Renderer::update_tetromino(Tetromino t)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-	int vertices[] = {
-		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
-		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
-		t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
-		t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
-		t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
-		t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
-		t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-
-		t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
-		t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
-		t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
-		t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	int32_t vertices[] = {
+		-1, 0,
+		0, 1,
+		1, 0
 	};
+	//int32_t vertices[] = {
+	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE,
+	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1,
+	//	t.x1 * Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE,
+	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2,
+	//	t.x2 * Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE,
+	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3,
+	//	t.x3 * Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+
+	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE,
+	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4,
+	//	t.x4 * Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//	t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE, t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE,
+	//};
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 }
 void Renderer::render()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	glUseProgram(Renderer::current_program);
 	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-	glDrawArrays(GL_TRIANGLES, 0, 16);
-	for (int idx = 0; idx < Renderer::vertex_buffer_objects.size(); ++idx) {
-		glUseProgram(Renderer::programs.at(idx));
-		glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
-		glDrawArrays(GL_TRIANGLES, 0, 16);
-	}
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//for (int idx = 0; idx < Renderer::vertex_buffer_objects.size(); ++idx) {
+	//	glUseProgram(Renderer::programs.at(idx));
+	//	glBindBuffer(GL_ARRAY_BUFFER, Renderer::current_vbo);
+	//	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//}
 	SDL_GL_SwapWindow(Renderer::WINDOW);
 }
 Renderer::~Renderer()

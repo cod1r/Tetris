@@ -331,7 +331,6 @@ void Tetris::loop()
 				Tetris::check_right()
 		) {
 			last_input_time_right = std::chrono::system_clock::now();
-			//++std::get<3>(Tetris::current_tetromino->first).first;
 			++Tetris::current_tetromino->x1;
 			++Tetris::current_tetromino->x2;
 			++Tetris::current_tetromino->x3;
