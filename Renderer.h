@@ -12,10 +12,11 @@ struct Renderer {
 	int32_t BLOCKSIZE;
 	GLuint vertex_shader;
 	GLuint fragment_shader;
-	GLuint current_vbo;
+	GLuint current_vao;
 	GLuint current_program;
 	std::vector<GLuint> programs;
 	std::vector<GLuint> vertex_buffer_objects;
+	std::vector<GLuint> vertex_array_objects;
 	void render_tetromino(Tetromino);
 	void update_tetromino(Tetromino);
 	void render();
