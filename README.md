@@ -16,7 +16,11 @@
 ## Build
 
 - Install SDL2
-- Run `make` using the provided Makefile
+- Install GLEW
+- `mkdir build`
+- `cd build`
+- `cmake -G <whatever CMake generator you want> ../`
+- Build using the build system that you generated
 
 ## Considerations
 
