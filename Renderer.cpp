@@ -126,13 +126,35 @@ void Renderer::render_tetromino(Tetromino t)
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
+
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 	std::vector<float> vertices = Renderer::convert_coords_to_vertices(t);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_DYNAMIC_DRAW);
 
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+	int32_t indices[] = {
+		0, 1, 2,
+		1, 3, 2,
+
+		4, 5, 6,
+		5, 7, 6,
+
+		8, 9, 10,
+		9, 11, 10,
+
+		12, 13, 14,
+		13, 15, 14,
+	};
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
+
 	Renderer::vertex_buffer_objects.push_back(vbo);
+	Renderer::element_buffer_objects.push_back(ebo);
 
 	Renderer::create_program();
 
@@ -176,11 +198,11 @@ void Renderer::render()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(Renderer::current_program);
 	glBindVertexArray(Renderer::current_vao);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
+	glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
 	for (int idx = 0; idx < Renderer::vertex_array_objects.size(); ++idx) {
 		glUseProgram(Renderer::programs.at(idx));
 		glBindVertexArray(Renderer::vertex_array_objects.at(idx));
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
+		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
 	}
 	SDL_GL_SwapWindow(Renderer::WINDOW);
 }

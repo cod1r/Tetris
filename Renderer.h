@@ -17,6 +17,7 @@ struct Renderer {
 	std::vector<GLuint> programs;
 	std::vector<GLuint> vertex_buffer_objects;
 	std::vector<GLuint> vertex_array_objects;
+	std::vector<GLuint> element_buffer_objects;
 	void render_tetromino(Tetromino);
 	void update_tetromino(Tetromino);
 	void render();
