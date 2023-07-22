@@ -158,7 +158,7 @@ void Renderer::render_tetromino(Tetromino t)
 
 	Renderer::create_program();
 
-	GLuint location = glGetAttribLocation(Renderer::current_program, "pos");
+	GLint location = glGetAttribLocation(Renderer::current_program, "pos");
 	if (location == -1) {
 		std::cerr << "pos's location could not be found" << std::endl;
 		throw;
@@ -199,7 +199,7 @@ void Renderer::render()
 	glUseProgram(Renderer::current_program);
 	glBindVertexArray(Renderer::current_vao);
 	glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
-	for (int idx = 0; idx < Renderer::vertex_array_objects.size(); ++idx) {
+	for (size_t idx = 0; idx < Renderer::vertex_array_objects.size(); ++idx) {
 		glUseProgram(Renderer::programs.at(idx));
 		glBindVertexArray(Renderer::vertex_array_objects.at(idx));
 		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);

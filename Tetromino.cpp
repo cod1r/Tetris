@@ -19,7 +19,18 @@ Tetromino::Tetromino(TetrominoType type, int32_t x1, int32_t y1, int32_t x2, int
 }
 Tetromino::Tetromino(const Tetromino& t)
 {
-	*this = Tetromino(t.type, t.x1, t.y1, t.x2, t.y2, t.x3, t.y3, t.x4, t.y4, t.red, t.green, t.blue);
+	this->type = t.type;
+	this->x1 = t.x1;
+	this->x2 = t.x2;
+	this->x3 = t.x3;
+	this->x4 = t.x4;
+	this->y1 = t.y1;
+	this->y2 = t.y2;
+	this->y3 = t.y3;
+	this->y4 = t.y4;
+	this->red = t.red;
+	this->green = t.green;
+	this->blue = t.blue;
 }
 Tetromino::Tetromino()
 {}

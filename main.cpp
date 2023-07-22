@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "Tetris.h"
 
-int main(int argc, char *argv[])
+int main()
 {
 	Tetris game = Tetris();
 	game.loop();
