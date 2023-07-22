@@ -153,235 +153,215 @@ bool Tetris::check_collision()
 
 void Tetris::check_line_clear()
 {
-	std::experimental::fixed_size_simd<int32_t, 10> a(Tetris::playfield[0].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a(Tetris::playfield[0].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[0][X2] = -1;
-		}
+		a = -1;
+		a.copy_to(Tetris::playfield[0].data(), std::experimental::element_aligned);
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a1(Tetris::playfield[1].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a1(Tetris::playfield[1].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a1 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[1][X2] = -1;
-		}
+		a1 = -1;
+		a1.copy_to(Tetris::playfield[1].data(), std::experimental::element_aligned);
 		for (int Y2 = 1; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a2(Tetris::playfield[2].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a2(Tetris::playfield[2].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a2 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[2][X2] = -1;
-		}
+		a2 = -1;
+		a2.copy_to(Tetris::playfield[2].data(), std::experimental::element_aligned);
 		for (int Y2 = 2; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a3(Tetris::playfield[3].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a3(Tetris::playfield[3].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a3 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[3][X2] = -1;
-		}
+		a3 = -1;
+		a3.copy_to(Tetris::playfield[3].data(), std::experimental::element_aligned);
 		for (int Y2 = 3; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a4(Tetris::playfield[4].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a4(Tetris::playfield[4].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a4 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[4][X2] = -1;
-		}
+		a4 = -1;
+		a4.copy_to(Tetris::playfield[4].data(), std::experimental::element_aligned);
 		for (int Y2 = 4; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a5(Tetris::playfield[5].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a5(Tetris::playfield[5].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a5 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[5][X2] = -1;
-		}
+		a5 = -1;
+		a5.copy_to(Tetris::playfield[5].data(), std::experimental::element_aligned);
 		for (int Y2 = 5; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a6(Tetris::playfield[6].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a6(Tetris::playfield[6].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a6 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[6][X2] = -1;
-		}
+		a6 = -1;
+		a6.copy_to(Tetris::playfield[6].data(), std::experimental::element_aligned);
 		for (int Y2 = 6; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a7(Tetris::playfield[7].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a7(Tetris::playfield[7].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a7 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[7][X2] = -1;
-		}
+		a7 = -1;
+		a7.copy_to(Tetris::playfield[7].data(), std::experimental::element_aligned);
 		for (int Y2 = 7; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a8(Tetris::playfield[8].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a8(Tetris::playfield[8].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a8 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[8][X2] = -1;
-		}
+		a8 = -1;
+		a8.copy_to(Tetris::playfield[8].data(), std::experimental::element_aligned);
 		for (int Y2 = 8; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a9(Tetris::playfield[9].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a9(Tetris::playfield[9].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a9 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[9][X2] = -1;
-		}
+		a9 = -1;
+		a9.copy_to(Tetris::playfield[9].data(), std::experimental::element_aligned);
 		for (int Y2 = 9; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a10(Tetris::playfield[10].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a10(Tetris::playfield[10].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a10 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[10][X2] = -1;
-		}
+		a10 = -1;
+		a10.copy_to(Tetris::playfield[10].data(), std::experimental::element_aligned);
 		for (int Y2 = 10; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a11(Tetris::playfield[11].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a11(Tetris::playfield[11].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a11 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[11][X2] = -1;
-		}
+		a11 = -1;
+		a11.copy_to(Tetris::playfield[11].data(), std::experimental::element_aligned);
 		for (int Y2 = 11; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a12(Tetris::playfield[12].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a12(Tetris::playfield[12].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a12 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[12][X2] = -1;
-		}
+		a12 = -1;
+		a12.copy_to(Tetris::playfield[12].data(), std::experimental::element_aligned);
 		for (int Y2 = 12; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a13(Tetris::playfield[13].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a13(Tetris::playfield[13].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a13 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[13][X2] = -1;
-		}
+		a13 = -1;
+		a13.copy_to(Tetris::playfield[13].data(), std::experimental::element_aligned);
 		for (int Y2 = 13; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a14(Tetris::playfield[14].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a14(Tetris::playfield[14].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a14 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[14][X2] = -1;
-		}
+		a14 = -1;
+		a14.copy_to(Tetris::playfield[14].data(), std::experimental::element_aligned);
 		for (int Y2 = 14; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a15(Tetris::playfield[15].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a15(Tetris::playfield[15].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a15 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[15][X2] = -1;
-		}
+		a15 = -1;
+		a15.copy_to(Tetris::playfield[15].data(), std::experimental::element_aligned);
 		for (int Y2 = 15; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a16(Tetris::playfield[16].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a16(Tetris::playfield[16].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a16 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[16][X2] = -1;
-		}
+		a16 = -1;
+		a16.copy_to(Tetris::playfield[16].data(), std::experimental::element_aligned);
 		for (int Y2 = 16; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a17(Tetris::playfield[17].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a17(Tetris::playfield[17].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a17 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[17][X2] = -1;
-		}
+		a17 = -1;
+		a17.copy_to(Tetris::playfield[17].data(), std::experimental::element_aligned);
 		for (int Y2 = 17; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a18(Tetris::playfield[18].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a18(Tetris::playfield[18].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a18 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[18][X2] = -1;
-		}
+		a18 = -1;
+		a18.copy_to(Tetris::playfield[18].data(), std::experimental::element_aligned);
 		for (int Y2 = 18; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
 			}
 		}
 	}
-	std::experimental::fixed_size_simd<int32_t, 10> a19(Tetris::playfield[19].data(), std::experimental::vector_aligned);
+	std::experimental::fixed_size_simd<int32_t, 10> a19(Tetris::playfield[19].data(), std::experimental::element_aligned);
 	if (std::experimental::all_of(a19 != -1)) {
 		++Tetris::lines_cleared;
-		for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
-			Tetris::playfield[19][X2] = -1;
-		}
+		a19 = -1;
+		a19.copy_to(Tetris::playfield[19].data(), std::experimental::element_aligned);
 		for (int Y2 = 19; Y2 > 0; --Y2) {
 			for (int X2 = 0; X2 < TETRIS_PLAYFIELD_WIDTH; ++X2) {
 				std::swap(Tetris::playfield[Y2][X2], Tetris::playfield[Y2 - 1][X2]);
