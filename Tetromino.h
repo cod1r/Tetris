@@ -36,9 +36,9 @@ struct Tetromino {
 			int32_t,
 			int32_t,
 			int32_t,
-			int8_t,
-			int8_t,
-			int8_t
+			uint8_t,
+			uint8_t,
+			uint8_t
 	);
 };
 #endif

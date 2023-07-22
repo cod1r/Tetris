@@ -1,7 +1,7 @@
 #include <cstdint>
 #include "Tetromino.h"
 Tetromino::Tetromino(TetrominoType type, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3,
-		int32_t x4, int32_t y4, int8_t red, int8_t green, int8_t blue)
+		int32_t x4, int32_t y4, uint8_t red, uint8_t green, uint8_t blue)
 {
 	Tetromino::type = type;
 	Tetromino::x1 = x1;
