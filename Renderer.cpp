@@ -121,6 +121,72 @@ std::vector<float> Renderer::convert_coords_to_vertices(Tetromino t)
 	};
 	return vertices;
 }
+void Renderer::update_playfield(int32_t row)
+{
+	for (size_t vbo_index = 0; vbo_index < this->vertex_buffer_objects.size() - 1; ++vbo_index) {
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.at(vbo_index));
+		GLint buffer_length;
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_length);
+		buffer_length /= sizeof(float);
+		std::vector<float> data(buffer_length);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.size(), data.data());
+		for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
+			if (data[data_index + 1] >= -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1)) {
+				data[data_index + 1] -= this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
+			}
+			if (data[data_index + 3] >= -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1)) {
+				data[data_index + 3] -= this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
+			}
+			if (data[data_index + 5] >= -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1)) {
+				data[data_index + 5] -= this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
+			}
+			if (data[data_index + 7] >= -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1)) {
+				data[data_index + 7] -= this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
+			}
+		}
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * buffer_length, data.data());
+	}
+}
+void Renderer::delete_row(int32_t row)
+{
+	float row_converted_1 = -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
+	float row_converted_2 = -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
+	float row_converted_3 = -((row * this->BLOCKSIZE + this->BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
+	float row_converted_4 = -((row * this->BLOCKSIZE + this->BLOCKSIZE) * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
+
+	for (size_t i = 0; i < this->vertex_buffer_objects.size() - 1; ++i) {
+		glBindVertexArray(this->vertex_array_objects.at(i));
+		glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.at(i));
+		GLint buffer_length;
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_length);
+		buffer_length /= sizeof(float);
+		std::vector<float> data(buffer_length);
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.size(), data.data());
+		std::vector<float> new_data;
+		for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
+			if (data[data_index + 1] == row_converted_1
+					&& data[data_index + 3] == row_converted_2
+					&& data[data_index + 5] == row_converted_3
+					&& data[data_index + 7] == row_converted_4) {
+				continue;
+			}
+			new_data.insert(new_data.end(), data.begin() + data_index, data.begin() + data_index + 8);
+		}
+		if (new_data.size() < data.size()) {
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * new_data.size(), new_data.data(), GL_DYNAMIC_DRAW);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->element_buffer_objects.at(i).first);
+			glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_length);
+			buffer_length /= sizeof(int32_t);
+			std::vector<int32_t> indices(buffer_length);
+			glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(int32_t) * indices.size(), indices.data());
+			indices.erase(indices.end() - (data.size() - new_data.size()) / 8 * 6, indices.end());
+			this->element_buffer_objects.at(i).second = indices.size();
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * indices.size(), indices.data(), GL_DYNAMIC_DRAW);
+		}
+	}
+}
 void Renderer::render_tetromino(Tetromino t)
 {
 	GLuint vao;
@@ -154,7 +220,7 @@ void Renderer::render_tetromino(Tetromino t)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
 
 	Renderer::vertex_buffer_objects.push_back(vbo);
-	Renderer::element_buffer_objects.push_back(ebo);
+	Renderer::element_buffer_objects.push_back(std::pair<GLuint, size_t>{ebo, 24});
 
 	Renderer::create_program();
 
@@ -198,11 +264,11 @@ void Renderer::render()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(Renderer::current_program);
 	glBindVertexArray(Renderer::current_vao);
-	glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, this->element_buffer_objects.back().second, GL_UNSIGNED_INT, 0);
 	for (size_t idx = 0; idx < Renderer::vertex_array_objects.size(); ++idx) {
 		glUseProgram(Renderer::programs.at(idx));
 		glBindVertexArray(Renderer::vertex_array_objects.at(idx));
-		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, this->element_buffer_objects.back().second, GL_UNSIGNED_INT, 0);
 	}
 	SDL_GL_SwapWindow(Renderer::WINDOW);
 }
