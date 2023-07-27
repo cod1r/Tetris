@@ -95,12 +95,11 @@ Tetromino Tetromino::rotate() {
       break;
     }
     case TetrominoType::Z: {
-      temp.x1 += 2;
+      temp.x1 += 1;
       temp.y1 -= 1;
-      temp.x2 += 1;
+      temp.x3 -= 1;
       temp.y3 -= 1;
-      temp.x4 -= 1;
-      temp.y4 += 1;
+      temp.x4 -= 2;
       break;
     }
     case TetrominoType::T: {
@@ -273,9 +272,20 @@ Tetromino Tetromino::rotate() {
       break;
     }
     case TetrominoType::T: {
+      temp.x1 -= 1;
+      temp.y1 -= 1;
+      temp.x2 += 1;
+      temp.y2 -= 1;
+      temp.x4 += 1;
+      temp.y4 += 1;
       break;
     }
     case TetrominoType::Z: {
+      temp.x1 -= 1;
+      temp.y1 -= 1;
+      temp.x3 -= 1;
+      temp.y3 += 1;
+      temp.y4 += 2;
       break;
     }
     }
