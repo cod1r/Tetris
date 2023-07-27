@@ -23,7 +23,7 @@ Tetris::Tetris() {
       new Tetromino(TetrominoType::J, 2, 0, 2, 1, 3, 1, 4, 1, 240, 165, 0),
       new Tetromino(TetrominoType::O, 4, 0, 5, 0, 4, 1, 5, 1, 255, 255, 0),
       new Tetromino(TetrominoType::T, 2, 1, 3, 0, 3, 1, 4, 1, 128, 0, 128),
-      new Tetromino(TetrominoType::S, 2, 1, 3, 0, 3, 1, 4, 0, 0, 255, 0),
+      new Tetromino(TetrominoType::S, 2, 1, 3, 1, 3, 0, 4, 0, 0, 255, 0),
       new Tetromino(TetrominoType::Z, 2, 0, 3, 0, 3, 1, 4, 1, 255, 0, 0),
   }};
   Tetris::LevelSpeed = {{1.0, 0.79300, 0.6178, 0.47273, 0.35520, 0.26200,
@@ -45,7 +45,28 @@ bool Tetris::check_fill() {
   return true;
 }
 
-void Tetris::rotate() {}
+void Tetris::rotate() {
+  Tetromino temp = this->current_tetromino->rotate();
+  if (temp.y1 < 0 || temp.y2 < 0 || temp.y3 < 0 || temp.y4 < 0 || temp.x1 < 0 ||
+      temp.x2 < 0 || temp.x3 < 0 || temp.x4 < 0 ||
+      temp.y1 >= this->TETRIS_PLAYFIELD_HEIGHT ||
+      temp.y2 >= this->TETRIS_PLAYFIELD_HEIGHT ||
+      temp.y3 >= this->TETRIS_PLAYFIELD_HEIGHT ||
+      temp.y4 >= this->TETRIS_PLAYFIELD_HEIGHT ||
+      temp.x1 >= this->TETRIS_PLAYFIELD_WIDTH ||
+      temp.x2 >= this->TETRIS_PLAYFIELD_WIDTH ||
+      temp.x3 >= this->TETRIS_PLAYFIELD_WIDTH ||
+      temp.x4 >= this->TETRIS_PLAYFIELD_WIDTH) {
+    return;
+  }
+  if (this->playfield[temp.y1][temp.x1] != -1 ||
+      this->playfield[temp.y2][temp.x2] != -1 ||
+      this->playfield[temp.y3][temp.x3] != -1 ||
+      this->playfield[temp.y4][temp.x4] != -1) {
+    return;
+  }
+  *this->current_tetromino = temp;
+}
 
 void Tetris::hard_drop() {
   int min_add = INT_MAX;
@@ -111,6 +132,7 @@ void Tetris::lock() {
     Tetris::generate_sequence();
     Tetris::sequence_index = 0;
   }
+  delete this->current_tetromino;
   Tetris::current_tetromino = new Tetromino(
       *Tetris::Tetrominos.at(Tetris::sequence.at(Tetris::sequence_index)));
   renderer->render_tetromino(*Tetris::current_tetromino);
@@ -386,7 +408,7 @@ void Tetris::loop() {
       collided = false;
     }
     Tetris::check_line_clear();
-    renderer->update_tetromino(*Tetris::current_tetromino);
+    renderer->update_tetromino(*this->current_tetromino);
     renderer->render();
   }
 }

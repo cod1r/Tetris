@@ -33,11 +33,11 @@ struct Tetris {
           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       }};
-  Renderer *renderer;
+  Renderer *renderer = nullptr;
   std::array<Tetromino *, 7> Tetrominos;
   std::array<double, 15> LevelSpeed;
   std::array<int32_t, 7> sequence;
-  Tetromino *current_tetromino;
+  Tetromino *current_tetromino = nullptr;
   const int32_t LINE_CLEAR_LEVELUP_AMOUNT = 10;
   const int32_t MAX_LEVELS = 15;
   int32_t sequence_index = 0;

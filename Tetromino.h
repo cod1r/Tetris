@@ -23,6 +23,7 @@ struct Tetromino {
   Tetromino rotate();
   Tetromino();
   Tetromino(const Tetromino &);
+  Tetromino &operator=(const Tetromino &);
   Tetromino(TetrominoType, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t,
             int32_t, int32_t, uint8_t, uint8_t, uint8_t);
 };
