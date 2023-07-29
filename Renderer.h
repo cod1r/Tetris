@@ -20,13 +20,13 @@ struct Renderer {
   std::vector<GLuint> vertex_buffer_objects;
   std::vector<GLuint> vertex_array_objects;
   std::vector<std::pair<GLuint, size_t>> element_buffer_objects;
-  void render_tetromino(Tetromino);
-  void update_tetromino(Tetromino);
+  void render_tetromino(const Tetromino&);
+  void update_tetromino(const Tetromino&);
   void update_playfield(int32_t);
   void delete_row(int32_t);
   void render();
   void create_program();
-  std::vector<float> convert_coords_to_vertices(Tetromino);
+  std::vector<float> convert_coords_to_vertices(const Tetromino&);
   Renderer();
   ~Renderer();
 };

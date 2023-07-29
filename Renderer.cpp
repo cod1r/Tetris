@@ -93,7 +93,7 @@ Renderer::Renderer() {
     throw;
   }
 }
-std::vector<float> Renderer::convert_coords_to_vertices(Tetromino t) {
+std::vector<float> Renderer::convert_coords_to_vertices(const Tetromino &t) {
   std::vector<float> vertices{
       t.x1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
       -(t.y1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
@@ -260,7 +260,7 @@ void Renderer::delete_row(int32_t row) {
     }
   }
 }
-void Renderer::render_tetromino(Tetromino t) {
+void Renderer::render_tetromino(const Tetromino &t) {
   GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
@@ -326,7 +326,7 @@ void Renderer::create_program() {
   glAttachShader(this->current_program, this->fragment_shader);
   glLinkProgram(this->current_program);
 }
-void Renderer::update_tetromino(Tetromino t) {
+void Renderer::update_tetromino(const Tetromino &t) {
   glBindVertexArray(this->current_vao);
   glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.back());
   std::vector<float> vertices = this->convert_coords_to_vertices(t);
