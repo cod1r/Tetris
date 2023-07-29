@@ -8,16 +8,14 @@
 #include <fstream>
 #include <iostream>
 Renderer::Renderer() {
-  Renderer::BLOCKSIZE =
-      Renderer::PLAYFIELD_HEIGHT / Tetris::TETRIS_PLAYFIELD_HEIGHT;
+  this->BLOCKSIZE = this->PLAYFIELD_HEIGHT / Tetris::TETRIS_PLAYFIELD_HEIGHT;
   int result = SDL_Init(SDL_INIT_VIDEO);
   if (result < 0) {
     std::cerr << SDL_GetError() << std::endl;
     throw;
   }
-  Renderer::WINDOW =
-      SDL_CreateWindow("Tetris", 0, 0, Renderer::WINDOW_WIDTH,
-                       Renderer::WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+  this->WINDOW = SDL_CreateWindow("Tetris", 0, 0, Renderer::WINDOW_WIDTH,
+                                  Renderer::WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
   SDL_GLContext ctx = SDL_GL_CreateContext(Renderer::WINDOW);
   if (ctx == NULL) {
     std::cerr << SDL_GetError() << std::endl;
@@ -34,7 +32,7 @@ Renderer::Renderer() {
     std::cerr << glewGetErrorString(glew_init_res) << std::endl;
     throw;
   }
-  Renderer::vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  this->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   std::ifstream vertex;
   vertex.open("shaders/vertex_shader.glsl");
   if (vertex.is_open()) {
@@ -64,7 +62,7 @@ Renderer::Renderer() {
     std::cerr << "Shader failed to open" << std::endl;
     throw;
   }
-  Renderer::fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  this->fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
   std::ifstream fragment;
   fragment.open("shaders/fragment_shader.glsl");
   if (fragment.is_open()) {
@@ -97,72 +95,72 @@ Renderer::Renderer() {
 }
 std::vector<float> Renderer::convert_coords_to_vertices(Tetromino t) {
   std::vector<float> vertices{
-      t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -(t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      (t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      t.x1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -(t.y1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      (t.x1 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -(t.y1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      t.x1 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -((t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -(t.y1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      t.x1 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -((t.y1 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
-      (t.x1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      (t.x1 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -((t.y1 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
-        1),
-
-      t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -(t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      (t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
-          1,
-      -(t.y2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      t.x2 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -((t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
-        1),
-      (t.x2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
-          1,
-      -((t.y2 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -((t.y1 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
 
-      t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -(t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      (t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      t.x2 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -(t.y2 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      (t.x2 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -(t.y3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      t.x3 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -((t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -(t.y2 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      t.x2 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -((t.y2 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
-      (t.x3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      (t.x2 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -((t.y3 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -((t.y2 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
 
-      t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -(t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      (t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      t.x3 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -(t.y3 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      (t.x3 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -(t.y4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1),
-      t.x4 * Renderer::BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_WIDTH - 1,
-      -((t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -(t.y3 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      t.x3 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -((t.y3 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
-      (t.x4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-              (float)Renderer::PLAYFIELD_WIDTH -
+      (t.x3 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
           1,
-      -((t.y4 * Renderer::BLOCKSIZE + Renderer::BLOCKSIZE) * 2 /
-            (float)Renderer::PLAYFIELD_HEIGHT -
+      -((t.y3 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
+        1),
+
+      t.x4 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -(t.y4 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      (t.x4 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
+          1,
+      -(t.y4 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT - 1),
+      t.x4 * this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_WIDTH - 1,
+      -((t.y4 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
+        1),
+      (t.x4 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+              (float)this->PLAYFIELD_WIDTH -
+          1,
+      -((t.y4 * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
+            (float)this->PLAYFIELD_HEIGHT -
         1),
   };
   return vertices;
@@ -170,7 +168,10 @@ std::vector<float> Renderer::convert_coords_to_vertices(Tetromino t) {
 void Renderer::update_playfield(int32_t row) {
   for (size_t vbo_index = 0; vbo_index < this->vertex_buffer_objects.size() - 1;
        ++vbo_index) {
-
+    if (!glIsVertexArray(this->vertex_array_objects.at(vbo_index))) {
+      continue;
+    }
+    glBindVertexArray(this->vertex_array_objects.at(vbo_index));
     glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.at(vbo_index));
     GLint buffer_length;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_length);
@@ -179,27 +180,24 @@ void Renderer::update_playfield(int32_t row) {
     glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.size(),
                        data.data());
     for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
-      if (data[data_index + 1] >=
-          -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT -
-            1)) {
+      int32_t first = ((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t second = ((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t third = ((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t fourth = ((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      //int32_t first = std::round(((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      //int32_t second = std::round(((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      //int32_t third = std::round(((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      //int32_t fourth = std::round(((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      if (first < row + 1 &&
+          second < row + 1 &&
+          third < row + 1 &&
+          fourth < row + 1) {
         data[data_index + 1] -=
             this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
-      }
-      if (data[data_index + 3] >=
-          -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT -
-            1)) {
         data[data_index + 3] -=
             this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
-      }
-      if (data[data_index + 5] >=
-          -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT -
-            1)) {
         data[data_index + 5] -=
             this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
-      }
-      if (data[data_index + 7] >=
-          -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT -
-            1)) {
         data[data_index + 7] -=
             this->BLOCKSIZE * 2 / (float)this->PLAYFIELD_HEIGHT;
       }
@@ -209,18 +207,10 @@ void Renderer::update_playfield(int32_t row) {
   }
 }
 void Renderer::delete_row(int32_t row) {
-  float row_converted_1 =
-      -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
-  float row_converted_2 =
-      -(row * this->BLOCKSIZE * 2 / (float)Renderer::PLAYFIELD_HEIGHT - 1);
-  float row_converted_3 = -((row * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
-                                (float)Renderer::PLAYFIELD_HEIGHT -
-                            1);
-  float row_converted_4 = -((row * this->BLOCKSIZE + this->BLOCKSIZE) * 2 /
-                                (float)Renderer::PLAYFIELD_HEIGHT -
-                            1);
-
   for (size_t i = 0; i < this->vertex_buffer_objects.size() - 1; ++i) {
+    if (!glIsVertexArray(this->vertex_array_objects.at(i))) {
+      continue;
+    }
     glBindVertexArray(this->vertex_array_objects.at(i));
     glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.at(i));
     GLint buffer_length;
@@ -231,32 +221,42 @@ void Renderer::delete_row(int32_t row) {
                        data.data());
     std::vector<float> new_data;
     for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
-      if (data[data_index + 1] == row_converted_1 &&
-          data[data_index + 3] == row_converted_2 &&
-          data[data_index + 5] == row_converted_3 &&
-          data[data_index + 7] == row_converted_4) {
+      int32_t first = ((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t second = ((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t third = ((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t fourth = ((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      if (first == row &&
+          second == row &&
+           third == row + 1 &&
+           fourth == row + 1) {
         continue;
       }
       new_data.insert(new_data.end(), data.begin() + data_index,
-                      data.begin() + data_index + 8);
+          data.begin() + data_index + 8);
     }
     if (new_data.size() < data.size()) {
-      glBufferData(GL_ARRAY_BUFFER, sizeof(float) * new_data.size(),
-                   new_data.data(), GL_DYNAMIC_DRAW);
+      if (!new_data.empty()) {
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * new_data.size(),
+            new_data.data(), GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+            this->element_buffer_objects.at(i).first);
+        glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE,
+            &buffer_length);
+        buffer_length /= sizeof(int32_t);
+        std::vector<int32_t> indices(buffer_length);
+        glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
+            sizeof(int32_t) * indices.size(), indices.data());
+        indices.erase(indices.end() - (data.size() - new_data.size()) / 8 * 6,
+            indices.end());
+        this->element_buffer_objects.at(i).second = indices.size();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * indices.size(),
+            indices.data(), GL_DYNAMIC_DRAW);
+      } else {
+        glDeleteVertexArrays(1, &this->vertex_array_objects.at(i));
+        glDeleteBuffers(1, &this->vertex_buffer_objects.at(i));
+        glDeleteBuffers(1, &this->element_buffer_objects.at(i).first);
+      }
 
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-                   this->element_buffer_objects.at(i).first);
-      glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE,
-                             &buffer_length);
-      buffer_length /= sizeof(int32_t);
-      std::vector<int32_t> indices(buffer_length);
-      glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
-                         sizeof(int32_t) * indices.size(), indices.data());
-      indices.erase(indices.end() - (data.size() - new_data.size()) / 8 * 6,
-                    indices.end());
-      this->element_buffer_objects.at(i).second = indices.size();
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * indices.size(),
-                   indices.data(), GL_DYNAMIC_DRAW);
     }
   }
 }
@@ -269,7 +269,7 @@ void Renderer::render_tetromino(Tetromino t) {
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-  std::vector<float> vertices = Renderer::convert_coords_to_vertices(t);
+  std::vector<float> vertices = this->convert_coords_to_vertices(t);
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(),
                vertices.data(), GL_DYNAMIC_DRAW);
 
@@ -289,13 +289,13 @@ void Renderer::render_tetromino(Tetromino t) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
                GL_DYNAMIC_DRAW);
 
-  Renderer::vertex_buffer_objects.push_back(vbo);
-  Renderer::element_buffer_objects.push_back(
+  this->vertex_buffer_objects.push_back(vbo);
+  this->element_buffer_objects.push_back(
       std::pair<GLuint, size_t>{ebo, 24});
 
-  Renderer::create_program();
+  this->create_program();
 
-  GLint location = glGetAttribLocation(Renderer::current_program, "pos");
+  GLint location = glGetAttribLocation(this->current_program, "pos");
   if (location == -1) {
     std::cerr << "pos's location could not be found" << std::endl;
     throw;
@@ -305,46 +305,50 @@ void Renderer::render_tetromino(Tetromino t) {
   glEnableVertexAttribArray(location);
 
   GLint out_color_location =
-      glGetUniformLocation(Renderer::current_program, "out_color");
+      glGetUniformLocation(this->current_program, "out_color");
   if (out_color_location == -1) {
     std::cerr << "out_color's location could not be found" << std::endl;
     throw;
   }
-  glUseProgram(Renderer::current_program);
+  glUseProgram(this->current_program);
   glUniform4f(out_color_location, t.red / 255.0f, t.green / 255.0f,
               t.blue / 255.0f, 1.0f);
-  if (glIsVertexArray(Renderer::current_vao)) {
-    Renderer::vertex_array_objects.push_back(Renderer::current_vao);
+  if (glIsVertexArray(this->current_vao)) {
+    this->vertex_array_objects.push_back(this->current_vao);
   }
-  Renderer::current_vao = vao;
+  this->current_vao = vao;
 }
 void Renderer::create_program() {
-  if (glIsProgram(Renderer::current_program))
-    Renderer::programs.push_back(Renderer::current_program);
-  Renderer::current_program = glCreateProgram();
-  glAttachShader(Renderer::current_program, Renderer::vertex_shader);
-  glAttachShader(Renderer::current_program, Renderer::fragment_shader);
-  glLinkProgram(Renderer::current_program);
+  if (glIsProgram(this->current_program))
+    this->programs.push_back(this->current_program);
+  this->current_program = glCreateProgram();
+  glAttachShader(this->current_program, this->vertex_shader);
+  glAttachShader(this->current_program, this->fragment_shader);
+  glLinkProgram(this->current_program);
 }
 void Renderer::update_tetromino(Tetromino t) {
-  glBindBuffer(GL_ARRAY_BUFFER, Renderer::vertex_buffer_objects.back());
-  std::vector<float> vertices = Renderer::convert_coords_to_vertices(t);
+  glBindVertexArray(this->current_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer_objects.back());
+  std::vector<float> vertices = this->convert_coords_to_vertices(t);
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * vertices.size(),
                   vertices.data());
 }
 void Renderer::render() {
   glClear(GL_COLOR_BUFFER_BIT);
-  glUseProgram(Renderer::current_program);
-  glBindVertexArray(Renderer::current_vao);
+  glUseProgram(this->current_program);
+  glBindVertexArray(this->current_vao);
   glDrawElements(GL_TRIANGLES, this->element_buffer_objects.back().second,
                  GL_UNSIGNED_INT, 0);
-  for (size_t idx = 0; idx < Renderer::vertex_array_objects.size(); ++idx) {
-    glUseProgram(Renderer::programs.at(idx));
-    glBindVertexArray(Renderer::vertex_array_objects.at(idx));
+  for (size_t idx = 0; idx < this->vertex_array_objects.size(); ++idx) {
+    if (!glIsVertexArray(this->vertex_array_objects.at(idx))) {
+      continue;
+    }
+    glUseProgram(this->programs.at(idx));
+    glBindVertexArray(this->vertex_array_objects.at(idx));
     glDrawElements(GL_TRIANGLES, this->element_buffer_objects.back().second,
                    GL_UNSIGNED_INT, 0);
   }
-  SDL_GL_SwapWindow(Renderer::WINDOW);
+  SDL_GL_SwapWindow(this->WINDOW);
 }
 Renderer::~Renderer() {
   SDL_DestroyWindow(Renderer::WINDOW);

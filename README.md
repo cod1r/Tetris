@@ -7,6 +7,7 @@
 ## Controls
 
  - `q`, to quit
+ - `p`, to pause/unpause (no indicator though)
  - Arrow Up, to rotate
  - Arrow Down, to soft drop
  - Arrow Right, to soft move right

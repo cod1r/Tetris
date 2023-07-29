@@ -43,8 +43,8 @@ struct Tetris {
   int32_t sequence_index = 0;
   int32_t level = 0;
   int32_t lines_cleared = 0;
-  const double ROTATE_SPEED = .1;
-  const double SOFT_MOVE_SPEED = .1;
+  const double ROTATE_SPEED = .15;
+  const double SOFT_MOVE_SPEED = .15;
   const double LOCK_DELAY = .5;
   bool left = false;
   bool right = false;
