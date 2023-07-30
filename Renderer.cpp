@@ -27,7 +27,7 @@ Renderer::Renderer() {
     throw;
   }
   GLenum glew_init_res = glewInit();
-  if (glew_init_res != GLEW_OK) {
+  if (glew_init_res != GLEW_OK && glew_init_res != GLEW_ERROR_NO_GLX_DISPLAY) {
     std::cerr << "Unable to initialize GLEW" << std::endl;
     std::cerr << glewGetErrorString(glew_init_res) << std::endl;
     throw;
