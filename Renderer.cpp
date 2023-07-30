@@ -180,14 +180,10 @@ void Renderer::update_playfield(int32_t row) {
     glGetBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * data.size(),
                        data.data());
     for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
-      int32_t first = ((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t second = ((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t third = ((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t fourth = ((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      //int32_t first = std::round(((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
-      //int32_t second = std::round(((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
-      //int32_t third = std::round(((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
-      //int32_t fourth = std::round(((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t first = std::round(((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t second = std::round(((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t third = std::round(((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t fourth = std::round(((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
       if (first < row + 1 &&
           second < row + 1 &&
           third < row + 1 &&
@@ -221,10 +217,10 @@ void Renderer::delete_row(int32_t row) {
                        data.data());
     std::vector<float> new_data;
     for (size_t data_index = 0; data_index < data.size(); data_index += 8) {
-      int32_t first = ((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t second = ((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t third = ((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
-      int32_t fourth = ((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE;
+      int32_t first = std::round(((-data[data_index + 1] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t second = std::round(((-data[data_index + 3] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t third = std::round(((-data[data_index + 5] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
+      int32_t fourth = std::round(((-data[data_index + 7] + 1.0f) * this->PLAYFIELD_HEIGHT / 2.0f) / this->BLOCKSIZE);
       if (first == row &&
           second == row &&
            third == row + 1 &&
