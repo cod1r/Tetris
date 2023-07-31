@@ -1,63 +1,51 @@
 #include "Tetromino.h"
 #include <cstdint>
 #include <iostream>
+
 Tetromino::Tetromino(TetrominoType type, int32_t x1, int32_t y1, int32_t x2,
                      int32_t y2, int32_t x3, int32_t y3, int32_t x4, int32_t y4,
-                     uint8_t red, uint8_t green, uint8_t blue) {
-  this->type = type;
-  this->x1 = x1;
-  this->y1 = y1;
-  this->x2 = x2;
-  this->y2 = y2;
-  this->x3 = x3;
-  this->y3 = y3;
-  this->x4 = x4;
-  this->y4 = y4;
-
-  this->red = red;
-  this->green = green;
-  this->blue = blue;
-
-  this->state = TetrominoState::BOTTOM;
+                     uint8_t red, uint8_t green, uint8_t blue) 
+    : type{type}
+    , x1{x1}
+    , y1{y1}
+    , x2{x2}
+    , y2{y2}
+    , x3{x3}
+    , y3{y3}
+    , x4{x4}
+    , y4{y4}
+    , red{red}
+    , blue{blue}
+    , green{green}
+    , state{TetrominoState::BOTTOM}
+{
 }
-Tetromino::Tetromino(const Tetromino &t) {
-  this->type = t.type;
-  this->x1 = t.x1;
-  this->x2 = t.x2;
-  this->x3 = t.x3;
-  this->x4 = t.x4;
-  this->y1 = t.y1;
-  this->y2 = t.y2;
-  this->y3 = t.y3;
-  this->y4 = t.y4;
-  this->red = t.red;
-  this->green = t.green;
-  this->blue = t.blue;
-  this->state = t.state;
-}
+
+Tetromino::Tetromino(const Tetromino &t) = default;
+
 Tetromino &Tetromino::operator=(const Tetromino &t) {
-  this->type = t.type;
-  this->x1 = t.x1;
-  this->x2 = t.x2;
-  this->x3 = t.x3;
-  this->x4 = t.x4;
-  this->y1 = t.y1;
-  this->y2 = t.y2;
-  this->y3 = t.y3;
-  this->y4 = t.y4;
-  this->red = t.red;
-  this->green = t.green;
-  this->blue = t.blue;
-  this->state = t.state;
+  type = t.type;
+  x1 = t.x1;
+  x2 = t.x2;
+  x3 = t.x3;
+  x4 = t.x4;
+  y1 = t.y1;
+  y2 = t.y2;
+  y3 = t.y3;
+  y4 = t.y4;
+  red = t.red;
+  green = t.green;
+  blue = t.blue;
+  state = t.state;
   return *this;
 }
 Tetromino::Tetromino() {}
 
 Tetromino Tetromino::rotate() {
   Tetromino temp = *this;
-  switch (this->state) {
+  switch (state) {
   case TetrominoState::BOTTOM: {
-    switch (this->type) {
+    switch (type) {
     case TetrominoType::I: {
       temp.x1 += 1;
       temp.y1 -= 2;
@@ -116,7 +104,7 @@ Tetromino Tetromino::rotate() {
     break;
   }
   case TetrominoState::TOP: {
-    switch (this->type) {
+    switch (type) {
     case TetrominoType::I: {
       temp.x1 -= 1;
       temp.y1 += 2;
@@ -175,7 +163,7 @@ Tetromino Tetromino::rotate() {
     break;
   }
   case TetrominoState::LEFT: {
-    switch (this->type) {
+    switch (type) {
     case TetrominoType::I: {
       temp.x1 += 2;
       temp.y1 += 1;
@@ -234,7 +222,7 @@ Tetromino Tetromino::rotate() {
     break;
   }
   case TetrominoState::RIGHT: {
-    switch (this->type) {
+    switch (type) {
     case TetrominoType::I: {
       temp.x1 -= 2;
       temp.y1 -= 1;
