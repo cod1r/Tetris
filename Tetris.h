@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <vector>
+#include <string>
 #include "Renderer.h"
 #include "Tetromino.h"
 #ifndef _TETRIS_H
@@ -59,6 +60,7 @@ struct Tetris {
   void lock();
   void check_line_clear();
   void generate_sequence();
+  void text_dump(const std::string& msg) const;
   void loop();
   Tetris();
 };

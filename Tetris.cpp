@@ -182,16 +182,7 @@ void Tetris::check_line_clear() {
     }
   }
   if (!rows_deleted.empty()) {
-    std::cerr << std::format("BEFORE\n");
-    for (int32_t row = 0; row < TETRIS_PLAYFIELD_HEIGHT; ++row) {
-      for (int32_t col = 0; col < TETRIS_PLAYFIELD_WIDTH; ++col) {
-        std::cerr << std::format("{} ", playfield[row][col] == -1
-            ? 0
-            : playfield[row][col]);
-      }
-      std::cerr << std::endl;
-    }
-    std::cerr << std::endl;
+    text_dump("BEFORE\n");
   }
   for (int32_t &DEL_ROW : rows_deleted) {
     for (int32_t COL = 0; COL < TETRIS_PLAYFIELD_WIDTH; ++COL) {
@@ -205,16 +196,7 @@ void Tetris::check_line_clear() {
     renderer.update_playfield(DEL_ROW);
   }
   if (!rows_deleted.empty()) {
-    std::cerr << std::format("AFTER\n");
-    for (int32_t row = 0; row < TETRIS_PLAYFIELD_HEIGHT; ++row) {
-      for (int32_t col = 0; col < TETRIS_PLAYFIELD_WIDTH; ++col) {
-        std::cerr << std::format("{} ", playfield[row][col] == -1
-            ? 0
-            : playfield[row][col]);
-      }
-      std::cerr << std::endl;
-    }
-    std::cerr << std::endl;
+    text_dump("AFTER\n");
   }
   if (lines_cleared == LINE_CLEAR_LEVELUP_AMOUNT) {
     ++level;
@@ -233,8 +215,15 @@ void Tetris::generate_sequence() {
     if (!seen.contains(a)) {
       seen.insert(a);
       sequence.at(temp_sequence_index++) = a;
+void Tetris::text_dump(const std::string& msg) const {
+  std::cout << msg;
+  for (int32_t row = 0; row < TETRIS_PLAYFIELD_HEIGHT; ++row) {
+    for (int32_t col = 0; col < TETRIS_PLAYFIELD_WIDTH; ++col) {
+      std::cout << (char)(playfield[row][col] == -1 ? '.' : '0'+playfield[row][col]);
     }
+    std::cout << '\n';
   }
+  std::cout << '\n';
 }
 
 bool Tetris::check_left() {
