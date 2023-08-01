@@ -3,6 +3,7 @@
 #include "Tetromino.h"
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <climits>
@@ -10,8 +11,8 @@
 #include <experimental/simd>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <random>
-#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -203,18 +204,6 @@ void Tetris::check_line_clear() {
     lines_cleared = 0;
   }
 }
-
-void Tetris::generate_sequence() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> distrib(0, 6);
-  std::set<int32_t> seen;
-  int32_t temp_sequence_index = 0;
-  while (seen.size() < 7) {
-    int32_t a = distrib(gen);
-    if (!seen.contains(a)) {
-      seen.insert(a);
-      sequence.at(temp_sequence_index++) = a;
 void Tetris::text_dump(const std::string& msg) const {
   std::cout << msg;
   for (int32_t row = 0; row < TETRIS_PLAYFIELD_HEIGHT; ++row) {
@@ -224,6 +213,13 @@ void Tetris::text_dump(const std::string& msg) const {
     std::cout << '\n';
   }
   std::cout << '\n';
+}
+
+void Tetris::generate_sequence() {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  std::iota(sequence.begin(), sequence.end(), 0);
+  std::shuffle(sequence.begin(), sequence.end(), gen);
 }
 
 bool Tetris::check_left() {
