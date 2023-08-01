@@ -39,7 +39,8 @@ Tetromino &Tetromino::operator=(const Tetromino &t) {
   state = t.state;
   return *this;
 }
-Tetromino::Tetromino() {}
+
+Tetromino::Tetromino() = default;
 
 Tetromino Tetromino::rotate() {
   Tetromino temp = *this;
