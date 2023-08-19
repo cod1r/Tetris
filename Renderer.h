@@ -1,10 +1,10 @@
+#ifndef _RENDERER_H
+#define _RENDERER_H
+#include "Tetromino.h"
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <array>
 #include <vector>
-#ifndef _RENDERER_H
-#define _RENDERER_H
-struct Tetromino;
 struct Renderer {
   SDL_Window *WINDOW = nullptr;
   const int32_t WINDOW_WIDTH = 300;

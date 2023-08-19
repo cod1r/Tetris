@@ -2,10 +2,11 @@
 #include <array>
 #include <cstdint>
 #include <vector>
+#include <string>
+#include "Renderer.h"
+#include "Tetromino.h"
 #ifndef _TETRIS_H
 #define _TETRIS_H
-struct Renderer;
-struct Tetromino;
 struct Tetris {
   static const int32_t TETRIS_PLAYFIELD_WIDTH = 10;
   static const int32_t TETRIS_PLAYFIELD_HEIGHT = 20;
@@ -33,11 +34,9 @@ struct Tetris {
           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
           {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
       }};
-  Renderer *renderer = nullptr;
-  std::array<Tetromino *, 7> Tetrominos;
-  std::array<double, 15> LevelSpeed;
+  Renderer renderer{};
   std::array<int32_t, 7> sequence;
-  Tetromino *current_tetromino = nullptr;
+  Tetromino current_tetromino;
   const int32_t LINE_CLEAR_LEVELUP_AMOUNT = 10;
   const int32_t MAX_LEVELS = 15;
   int32_t sequence_index = 0;
@@ -61,6 +60,7 @@ struct Tetris {
   void lock();
   void check_line_clear();
   void generate_sequence();
+  void text_dump(const std::string& msg) const;
   void loop();
   Tetris();
 };
