@@ -33,4 +33,4 @@
 - No adjustable settings.
 - No textures.
 
-## TODO -- rewrite using webgpu with [Dawn](https://dawn.googlesource.com/dawn/)
+## TODO -- use glslang to go from glsl to spirv and then use spirv-cross to decompile spirv to metal
