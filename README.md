@@ -33,4 +33,4 @@
 - No adjustable settings.
 - No textures.
 
-## TODO -- use glslang to go from glsl to spirv and then use spirv-cross to decompile spirv to metal
+## TODO -- use glslang to go from glsl to spirv and then use spirv-cross to decompile spirv to wgsl and learn webgpu
